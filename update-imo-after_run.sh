@@ -40,7 +40,7 @@ if git diff-index --quiet HEAD --; then
 fi
 
 echo "Committing changes..."
-git commit -m "Update IMOitself/AfterRun java files" -m "last commit: https://github.com/IMOitself/AfterRun/tree/$LATEST_COMMIT"
+git commit -m "Update IMOitself/AfterRun java files" -m "last commit: https://github.com/IMOitself/AfterRun/commits/$LATEST_COMMIT"
 
 echo "Update and commit complete."
 
