@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import imo.after_run.TermuxUtilsV2;
+import imo.after_run.CommandTermux;
 
 public class MainActivity extends Activity 
 {
@@ -32,8 +32,8 @@ public class MainActivity extends Activity
             return;
 		}
 		
-		if(! TermuxUtilsV2.permissionIsGranted(this)){
-			TermuxUtilsV2.permissionRequest(this);
+		if(! CommandTermux.permissionIsGranted(this)){
+			CommandTermux.permissionRequest(this);
 			finish();
 			return;
 		}
@@ -49,29 +49,24 @@ public class MainActivity extends Activity
 		repoLoadBtn.setOnClickListener(new View.OnClickListener(){
 			@Override
 			public void onClick(View v){
-				instruction.setVisibility(View.VISIBLE);
+				if (! CommandTermux.backgroundMode) instruction.setVisibility(View.VISIBLE);
 				String repoPath = repoPathEdit.getText().toString().trim();
 				String command = "cd " + repoPath;
 				command += "\ngit config --global --add safe.directory " + repoPath;
 				command += "\ngit status";
 				
-				TermuxUtilsV2.commandRun(command, MainActivity.this);
+				Runnable onDetect = new Runnable(){
+					@Override
+					public void run(){
+						if (! CommandTermux.backgroundMode) instruction.setVisibility(View.GONE);
+						outputTxt.setText(CommandTermux.OutputDetector.output);
+					}
+				};
+				CommandTermux.OutputDetector.start(onDetect, MainActivity.this);
+				CommandTermux.run(command, MainActivity.this);
 			}
 		});
     }
-	
-	@Override
-	protected void onResume() {
-		super.onResume();
-		if(! TermuxUtilsV2.commandOutputExists()) return;
-
-		String content = TermuxUtilsV2.commandOutputRead();
-
-		if(content.toString().trim().isEmpty()) return;
-
-		instruction.setVisibility(View.GONE);
-		outputTxt.setText(content.toString());
-	}
 	
 	
 	boolean hasStoragePermission() {
