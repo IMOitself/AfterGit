@@ -3,9 +3,9 @@ android app for managing local git repos
 
 implementation of the [AfterRun](https://github.com/IMOitself/AfterRun) app
 
-| 1 | 2 | 3 
-|:-------:|:-------:|:-------:|
-| ![screenshot 1](assets/screenshot1.jpg) | ![screenshot 2](assets/screenshot2.jpg) | ![screenshot 3](assets/screenshot3.jpg) |
+| 1 | 2 
+|:-------:|:-------:|
+| ![screenshot 1](assets/screenshot1.jpg) | ![screenshot 2](assets/screenshot2.jpg) |
 ## Download
 comming soon...
 
