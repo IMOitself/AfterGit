@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import imo.after_run.CommandTermux;
 import android.widget.LinearLayout;
+import java.io.File;
 
 public class MainActivity extends Activity 
 {
@@ -43,7 +44,8 @@ public class MainActivity extends Activity
 			@Override
 			public void onClick(View v){
 				if (! CommandTermux.backgroundMode) instruction.setVisibility(View.VISIBLE);
-				String repoPath = repoPathEdit.getText().toString().trim();
+				final String repoPath = repoPathEdit.getText().toString().trim();
+                
 				String command = "cd " + repoPath;
 				command += "\ngit status";
 				
@@ -57,7 +59,7 @@ public class MainActivity extends Activity
                             
                             boolean isWorking = output.contains("On branch");
                             
-                            if(! isWorking) fixGit(output);
+                            if(! isWorking) fixGit(output, repoPath);
                         }
                     })
                     .run();
@@ -65,45 +67,59 @@ public class MainActivity extends Activity
 		});
     }
     
-    void fixGit(String output){
+    void fixGit(final String output, String repoPath){
+        String dialogTitle = "";
+        String dialogMessage = "";
+        String stringToCopy = "";
+        String dialogButtonText = "Open Termux";
+        
         if(output.contains("git: not found")) {
-            LinearLayout messageLayout = new LinearLayout(MainActivity.this);
-            TextView messageText = new TextView(MainActivity.this);
-            Button copyBtn = new Button(MainActivity.this);
-
-            messageText.setText("type this on Termux to install git:\n\npkg install git -y");
-            copyBtn.setText("Copy");
-            copyBtn.setOnClickListener(new View.OnClickListener(){
-                    @Override
-                    public void onClick(View v){
-                        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                        if (clipboard == null) return;
-                        ClipData clip = ClipData.newPlainText("Copied Text", "pkg install git -y");
-                        clipboard.setPrimaryClip(clip);
-
-                        Toast.makeText(MainActivity.this, "Text copied to clipboard", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-            messageLayout.setOrientation(LinearLayout.VERTICAL);
-            messageLayout.addView(messageText);
-            messageLayout.addView(copyBtn);
-
-            new AlertDialog.Builder(MainActivity.this)
-                .setTitle("Git not installed")
-                .setView(messageLayout)
-                .setNegativeButton("Open Termux", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dia, int which) {
-                        try {
-                            CommandTermux.openTermux(MainActivity.this);
-                        } catch(Exception e) {}
-                    }
-                })
-                .create().show();
-            return;
+            dialogTitle = "Git not installed";
+            dialogMessage = "type this on Termux to install git:\n\npkg install git -y";
+            stringToCopy = "pkg install git -y";
         }
-        //TODO: run command "\ngit config --global --add safe.directory "
-        //      if current repoPath is not set yet
+        else
+        if(output.contains("dubious ownership")){
+            dialogTitle = "Repo not listed in safe directories";
+            dialogMessage = "type this to add repo as safe directory:\n\ngit config --global --add safe.directory " + repoPath;
+            stringToCopy = "git config --global --add safe.directory " + repoPath;
+        }
+        
+        LinearLayout messageLayout = new LinearLayout(MainActivity.this);
+        TextView messageText = new TextView(MainActivity.this);
+        Button copyBtn = new Button(MainActivity.this);
+
+        messageText.setText(dialogMessage);
+        copyBtn.setText("Copy");
+        final String copyString = stringToCopy;
+        
+        copyBtn.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    if (clipboard == null) return;
+                    ClipData clip = ClipData.newPlainText("Copied Text", copyString);
+                    clipboard.setPrimaryClip(clip);
+
+                    Toast.makeText(MainActivity.this, "Text copied to clipboard", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        messageLayout.setOrientation(LinearLayout.VERTICAL);
+        messageLayout.addView(messageText);
+        messageLayout.addView(copyBtn);
+
+        new AlertDialog.Builder(MainActivity.this)
+            .setTitle(dialogTitle)
+            .setView(messageLayout)
+            .setPositiveButton("Open Termux", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dia, int which) {
+                    try {
+                        CommandTermux.openTermux(MainActivity.this);
+                    } catch(Exception e) {}
+                }
+            })
+            .create().show();
     }
 }
