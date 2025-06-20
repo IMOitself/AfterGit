@@ -72,6 +72,7 @@ public class MainActivity extends Activity
             Button copyBtn = new Button(MainActivity.this);
 
             messageText.setText("type this on Termux to install git:\n\npkg install git -y");
+            copyBtn.setText("Copy");
             copyBtn.setOnClickListener(new View.OnClickListener(){
                     @Override
                     public void onClick(View v){
