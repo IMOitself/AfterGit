@@ -71,7 +71,6 @@ public class MainActivity extends Activity
         String dialogTitle = "";
         String dialogMessage = "";
         String stringToCopy = "";
-        String dialogButtonText = "Open Termux";
         
         if(output.contains("git: not found")) {
             dialogTitle = "Git not installed";
@@ -83,6 +82,9 @@ public class MainActivity extends Activity
             dialogTitle = "Repo not listed in safe directories";
             dialogMessage = "type this to add repo as safe directory:\n\ngit config --global --add safe.directory " + repoPath;
             stringToCopy = "git config --global --add safe.directory " + repoPath;
+        }
+        else{
+            return;
         }
         
         LinearLayout messageLayout = new LinearLayout(MainActivity.this);
