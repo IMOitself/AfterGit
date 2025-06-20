@@ -26,17 +26,9 @@ public class MainActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-		if(! hasStoragePermission()){
-            requestStoragePermission();
-            finish();
-            return;
-		}
-		
-		if(! CommandTermux.permissionIsGranted(this)){
-			CommandTermux.permissionRequest(this);
-			finish();
-			return;
-		}
+        
+		CommandTermux.checkAndRequestPermissions(this);
+        
 		
 		final EditText repoPathEdit = findViewById(R.id.repo_path_edittext);
 		final Button repoLoadBtn = findViewById(R.id.repo_load_btn);
@@ -66,25 +58,5 @@ public class MainActivity extends Activity
 				CommandTermux.run(command, MainActivity.this);
 			}
 		});
-    }
-	
-	
-	boolean hasStoragePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            return Environment.isExternalStorageManager();
-        } else {
-            return checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-        }
-    }
-
-    void requestStoragePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-            intent.setData(Uri.parse("package:" + getPackageName()));
-            startActivity(intent);
-        } else {
-			requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
-            requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 100);
-        }
     }
 }
