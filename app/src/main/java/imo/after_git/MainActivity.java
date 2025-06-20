@@ -57,51 +57,52 @@ public class MainActivity extends Activity
                             
                             boolean isWorking = output.contains("On branch");
                             
-                            if(isWorking) return;
-                            
-                            if(output.contains("git: not found")) {
-                                LinearLayout messageLayout = new LinearLayout(MainActivity.this);
-                                TextView messageText = new TextView(MainActivity.this);
-                                Button copyBtn = new Button(MainActivity.this);
-                                
-                                messageText.setText("type this on Termux to install git:\n\npkg install git -y");
-                                copyBtn.setOnClickListener(new View.OnClickListener(){
-                                    @Override
-                                    public void onClick(View v){
-                                        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                                        if (clipboard == null) return;
-                                        ClipData clip = ClipData.newPlainText("Copied Text", "pkg install git -y");
-                                        clipboard.setPrimaryClip(clip);
-
-                                        Toast.makeText(MainActivity.this, "Text copied to clipboard", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                                
-                                messageLayout.setOrientation(LinearLayout.VERTICAL);
-                                messageLayout.addView(messageText);
-                                messageLayout.addView(copyBtn);
-                                
-                                new AlertDialog.Builder(MainActivity.this)
-                                    .setTitle("Git not installed")
-                                    .setView(messageLayout)
-                                    .setNegativeButton("Open Termux", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dia, int which) {
-                                            try {
-                                                CommandTermux.openTermux(MainActivity.this);
-                                            } catch(Exception e) {}
-                                        }
-                                    })
-                                    .create().show();
-                                return;
-                            }
-
-                            //TODO: run command "\ngit config --global --add safe.directory "
-                            //      if current repoPath is not set yet
+                            if(! isWorking) fixGit(output);
                         }
                     })
                     .run();
 			}
 		});
+    }
+    
+    void fixGit(String output){
+        if(output.contains("git: not found")) {
+            LinearLayout messageLayout = new LinearLayout(MainActivity.this);
+            TextView messageText = new TextView(MainActivity.this);
+            Button copyBtn = new Button(MainActivity.this);
+
+            messageText.setText("type this on Termux to install git:\n\npkg install git -y");
+            copyBtn.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v){
+                        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                        if (clipboard == null) return;
+                        ClipData clip = ClipData.newPlainText("Copied Text", "pkg install git -y");
+                        clipboard.setPrimaryClip(clip);
+
+                        Toast.makeText(MainActivity.this, "Text copied to clipboard", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            messageLayout.setOrientation(LinearLayout.VERTICAL);
+            messageLayout.addView(messageText);
+            messageLayout.addView(copyBtn);
+
+            new AlertDialog.Builder(MainActivity.this)
+                .setTitle("Git not installed")
+                .setView(messageLayout)
+                .setNegativeButton("Open Termux", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dia, int which) {
+                        try {
+                            CommandTermux.openTermux(MainActivity.this);
+                        } catch(Exception e) {}
+                    }
+                })
+                .create().show();
+            return;
+        }
+        //TODO: run command "\ngit config --global --add safe.directory "
+        //      if current repoPath is not set yet
     }
 }
