@@ -47,15 +47,15 @@ public class MainActivity extends Activity
 				command += "\ngit config --global --add safe.directory " + repoPath;
 				command += "\ngit status";
 				
-				Runnable onDetect = new Runnable(){
-					@Override
-					public void run(){
-						if (! CommandTermux.backgroundMode) instruction.setVisibility(View.GONE);
-						outputTxt.setText(CommandTermux.OutputDetector.output);
-					}
-				};
-				CommandTermux.OutputDetector.start(onDetect, MainActivity.this);
-				CommandTermux.run(command, MainActivity.this);
+				outputTxt.setText("wait..");
+                new CommandTermux(command, MainActivity.this)
+                    .setOnDetect(new Runnable(){
+                        @Override
+                        public void run(){
+                            outputTxt.setText(CommandTermux.OutputDetector.output);
+                        }
+                    })
+                    .run();
 			}
 		});
     }
