@@ -65,7 +65,7 @@ public class MainActivity extends Activity
             .setOnDetect(new Runnable(){
                 @Override
                 public void run(){
-                    String output = CommandTermux.OutputDetector.output;
+                    String output = CommandTermux.getOutput();
                     outputTxt.setText(output);
 
                     boolean isWorking = output.contains("On branch");
