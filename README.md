@@ -10,7 +10,7 @@ implementation of the [AfterRun](https://github.com/IMOitself/AfterRun) app
 > [!WARNING]
 > This project is at its early stages and is prone to bugs
 
-comming soon...
+[![Download](https://img.shields.io/badge/compiled.apk-blue?style=for-the-badge)](https://github.com/IMOitself/AfterGit/blob/master/compiled.apk)
 
 <br>
 
