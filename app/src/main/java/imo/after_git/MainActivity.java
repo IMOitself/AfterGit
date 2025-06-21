@@ -49,6 +49,12 @@ public class MainActivity extends Activity
 			}
 		});
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        outputTxt.setText("click load button");
+    }
     
     void runGitStatus(final String repoPath, final TextView outputTxt){
         String command = "cd " + repoPath;
@@ -65,6 +71,12 @@ public class MainActivity extends Activity
                     boolean isWorking = output.contains("On branch");
 
                     if(! isWorking) fixGit(output, repoPath);
+                }
+            })
+            .setOnCancel(new Runnable(){
+                @Override
+                public void run(){
+                    outputTxt.setText("try again");
                 }
             })
             .run();
