@@ -20,7 +20,6 @@ import java.io.File;
 
 public class MainActivity extends Activity 
 {
-	ViewGroup instruction;
 	TextView outputTxt;
 	
     @Override
@@ -34,16 +33,12 @@ public class MainActivity extends Activity
 		
 		final EditText repoPathEdit = findViewById(R.id.repo_path_edittext);
 		final Button repoLoadBtn = findViewById(R.id.repo_load_btn);
-		instruction = findViewById(R.id.instruction);
 		outputTxt = findViewById(R.id.output_txt);
 		outputTxt.setMovementMethod(new ScrollingMovementMethod());
-		
-		instruction.setVisibility(View.GONE);
-		
+        
 		repoLoadBtn.setOnClickListener(new View.OnClickListener(){
 			@Override
 			public void onClick(View v){
-				if (! CommandTermux.backgroundMode) instruction.setVisibility(View.VISIBLE);
 				final String repoPath = repoPathEdit.getText().toString().trim();
 				runGitStatus(repoPath, outputTxt);
 			}
