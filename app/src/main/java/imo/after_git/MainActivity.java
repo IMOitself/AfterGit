@@ -89,14 +89,14 @@ public class MainActivity extends Activity
         
         if(output.contains("git: not found")) {
             dialogTitle = "Git not installed";
-            dialogMessage = "paste this on Termux to install git:\n\npkg install git -y";
-            stringToCopy = "pkg install git -y";
+            stringToCopy = "pkg install git -y && exit";
+            dialogMessage = "paste this on Termux to install git:\n\n" + stringToCopy;
         }
         else
         if(output.contains("dubious ownership")){
             dialogTitle = "Repo not listed in safe directories";
-            dialogMessage = "paste this on Termux to add repo as safe directory:\n\ngit config --global --add safe.directory " + repoPath;
-            stringToCopy = "git config --global --add safe.directory " + repoPath;
+            stringToCopy = "git config --global --add safe.directory " + repoPath + " && exit";
+            dialogMessage = "paste this on Termux to add repo as safe directory:\n\n" + stringToCopy;
         }
         else{
             return;
