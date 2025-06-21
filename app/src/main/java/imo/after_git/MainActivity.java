@@ -45,26 +45,29 @@ public class MainActivity extends Activity
 			public void onClick(View v){
 				if (! CommandTermux.backgroundMode) instruction.setVisibility(View.VISIBLE);
 				final String repoPath = repoPathEdit.getText().toString().trim();
-                
-				String command = "cd " + repoPath;
-				command += "\ngit status";
-				
-				outputTxt.setText("wait..");
-                new CommandTermux(command, MainActivity.this)
-                    .setOnDetect(new Runnable(){
-                        @Override
-                        public void run(){
-                            String output = CommandTermux.OutputDetector.output;
-                            outputTxt.setText(output);
-                            
-                            boolean isWorking = output.contains("On branch");
-                            
-                            if(! isWorking) fixGit(output, repoPath);
-                        }
-                    })
-                    .run();
+				runGitStatus(repoPath, outputTxt);
 			}
 		});
+    }
+    
+    void runGitStatus(final String repoPath, final TextView outputTxt){
+        String command = "cd " + repoPath;
+        command += "\ngit status";
+
+        outputTxt.setText("wait..");
+        new CommandTermux(command, MainActivity.this)
+            .setOnDetect(new Runnable(){
+                @Override
+                public void run(){
+                    String output = CommandTermux.OutputDetector.output;
+                    outputTxt.setText(output);
+
+                    boolean isWorking = output.contains("On branch");
+
+                    if(! isWorking) fixGit(output, repoPath);
+                }
+            })
+            .run();
     }
     
     void fixGit(final String output, String repoPath){
@@ -100,8 +103,7 @@ public class MainActivity extends Activity
                 public void onClick(View v){
                     ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                     if (clipboard == null) return;
-                    ClipData clip = ClipData.newPlainText("Copied Text", copyString);
-                    clipboard.setPrimaryClip(clip);
+                    clipboard.setPrimaryClip(ClipData.newPlainText("Copied Text", copyString));
 
                     Toast.makeText(MainActivity.this, "Text copied to clipboard", Toast.LENGTH_SHORT).show();
                 }
