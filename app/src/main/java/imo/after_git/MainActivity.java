@@ -83,7 +83,7 @@ public class MainActivity extends Activity
         else
         if(output.contains("dubious ownership")){
             dialogTitle = "Repo not listed in safe directories";
-            dialogMessage = "type this to add repo as safe directory:\n\ngit config --global --add safe.directory " + repoPath;
+            dialogMessage = "type this on Termux to add repo as safe directory:\n\ngit config --global --add safe.directory " + repoPath;
             stringToCopy = "git config --global --add safe.directory " + repoPath;
         }
         else{
