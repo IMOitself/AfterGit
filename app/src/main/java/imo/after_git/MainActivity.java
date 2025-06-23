@@ -26,6 +26,7 @@ public class MainActivity extends Activity
     String repoPath = "";
     String statusShort = "";
     boolean isStop = false;
+    boolean canRefreshStatus = false;
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -110,7 +111,7 @@ public class MainActivity extends Activity
     @Override
     protected void onResume() {
         super.onResume();
-        if(!isStop) return;
+        if(!isStop || !canRefreshStatus) return;
         
         //update status
         statusBtn.performClick();
@@ -137,10 +138,12 @@ public class MainActivity extends Activity
                     
                     if(output.contains("cd: can't cd")){
                         outputTxt.setText("not a folder path");
+                        canRefreshStatus = false;
                         return;
                     }
                     if(output.contains("fatal: not a git repository")){
                         outputTxt.setText("not a git repository");
+                        canRefreshStatus = false;
                         return;
                     }
                     
@@ -151,6 +154,8 @@ public class MainActivity extends Activity
                     
                     outputTxt.setText(statusLong);
                     onStatusShort.run();
+                    
+                    canRefreshStatus = true;
                 }
             })
             .setLoading(outputTxt)
