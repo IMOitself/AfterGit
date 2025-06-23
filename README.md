@@ -1,5 +1,5 @@
 # AfterGit
-android app for managing local git repos
+android app for running git commands
 
 implementation of the [AfterRun](https://github.com/IMOitself/AfterRun) app
 
