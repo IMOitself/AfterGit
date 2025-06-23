@@ -23,7 +23,7 @@ public class MainActivity extends Activity
 {
 	TextView outputTxt;
     String repoPath = "";
-	
+    
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -39,14 +39,37 @@ public class MainActivity extends Activity
         final Button pullBtn = findViewById(R.id.pull_btn);
         final Button pushBtn = findViewById(R.id.push_btn);
 		outputTxt = findViewById(R.id.output_txt);
-        //TODO: hide commit, pull and push button initially
+        commitBtn.setVisibility(View.GONE);
+        pullBtn.setVisibility(View.GONE);
+        pushBtn.setVisibility(View.GONE);
         
 		statusBtn.setOnClickListener(new View.OnClickListener(){
 			@Override
 			public void onClick(View v){
 				repoPath = repoPathEdit.getText().toString().trim();
-				runGitStatus(repoPath, outputTxt);
-                //TODO: show commit, pull and push button only if needed
+                
+                Runnable onEnd = new Runnable(){
+                    @Override
+                    public void run(){
+                        String gitStatus = outputTxt.getText().toString();
+                        if(gitStatus.contains("nothing to commit")){
+                            commitBtn.setVisibility(View.GONE);
+                        }else{
+                            commitBtn.setVisibility(View.VISIBLE);
+                        }
+                        if(gitStatus.contains("branch is ahead of")){
+                            pushBtn.setVisibility(View.VISIBLE);
+                        }else{
+                            pushBtn.setVisibility(View.GONE);
+                        }
+                        if(gitStatus.contains("branch is behind of")){
+                            pullBtn.setVisibility(View.VISIBLE);
+                        }else{
+                            pullBtn.setVisibility(View.GONE);
+                        }
+                    }
+                };
+				runGitStatus(repoPath, outputTxt, onEnd);
 			}
 		});
         
@@ -83,7 +106,7 @@ public class MainActivity extends Activity
         outputTxt.setText("click status button to load repository folder");
     }
     
-    void runGitStatus(final String repoPath, final TextView outputTxt){
+    void runGitStatus(final String repoPath, final TextView outputTxt, final Runnable onEnd){
         String command = "cd " + repoPath;
         command += "\ngit status";
 
@@ -94,6 +117,7 @@ public class MainActivity extends Activity
                 public void run(){
                     String output = CommandTermux.getOutput();
                     outputTxt.setText(output);
+                    onEnd.run();
 
                     boolean isWorking = output.contains("On branch");
 
