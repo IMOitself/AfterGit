@@ -136,16 +136,7 @@ public class MainActivity extends Activity
                 public void run(){
                     String output = CommandTermux.getOutput();
                     
-                    if(output.contains("cd: can't cd")){
-                        outputTxt.setText("not a folder path");
-                        canRefreshStatus = false;
-                        return;
-                    }
-                    if(output.contains("fatal: not a git repository")){
-                        outputTxt.setText("not a git repository");
-                        canRefreshStatus = false;
-                        return;
-                    }
+                    if(! isRepository(output, outputTxt)) return;
                     
                     String[] outputParts = output.split(commandDivider);
                     
@@ -154,12 +145,25 @@ public class MainActivity extends Activity
                     
                     outputTxt.setText(statusLong);
                     onStatusShort.run();
-                    
-                    canRefreshStatus = true;
                 }
             })
             .setLoading(outputTxt)
             .run();
+    }
+    
+    boolean isRepository(String commandOutput, TextView textview){
+        if(commandOutput.contains("cd: can't cd")){
+            outputTxt.setText("not a folder path");
+            canRefreshStatus = false;
+            return false;
+        }
+        if(commandOutput.contains("fatal: not a git repository")){
+            outputTxt.setText("not a git repository");
+            canRefreshStatus = false;
+            return false;
+        }
+        canRefreshStatus = true;
+        return true;
     }
     
     AlertDialog commitDialog(final String repoPath){
