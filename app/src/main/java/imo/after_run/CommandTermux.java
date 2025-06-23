@@ -108,25 +108,39 @@ public class CommandTermux {
         this.mActivity = mActivity;
     }
     
+    @Deprecated
     public CommandTermux setOnDetect(Runnable runnable){
         onDetect = runnable;
         return this;
     }
     
+    @Deprecated
     public CommandTermux setOnLoop(Runnable runnable){
         onLoop = runnable;
         return this;
     }
     
+    @Deprecated
     public CommandTermux setOnCancel(Runnable runnable){
         onCancel = runnable;
         return this;
     }
     
+    public CommandTermux setOnEnd(Runnable runnable){
+        return setOnDetect(runnable);
+    }
+    
+    public CommandTermux setOnLoading(Runnable runnable){
+        return setOnLoop(runnable);
+    }
+    
+    public CommandTermux setOnError(Runnable runnable){
+        return setOnCancel(runnable);
+    }
+    
     //quick setup for setting output to textview
     public CommandTermux quickSetOutput(final TextView textview){
-        quickSetOutput(textview, null);
-        return this;
+        return quickSetOutput(textview, null);
     }
     
     public CommandTermux quickSetOutput(final TextView textview, final Runnable onOutput){
@@ -148,18 +162,35 @@ public class CommandTermux {
     }
     
     public CommandTermux quickSetOutputWithLoading(final TextView textview){
-        quickSetOutputWithLoading(textview, null);
-        return this;
+        return quickSetOutputWithLoading(textview, null);
     }
     
     public CommandTermux quickSetOutputWithLoading(final TextView textview, final Runnable onOutput){
-        quickSetOutputWithLoading(textview, onOutput, "waiting");
-        return this;
+        return quickSetOutputWithLoading(textview, onOutput, "waiting");
     }
     
     public CommandTermux quickSetOutputWithLoading(final TextView textview, final Runnable onOutput, final String loadingText){
         //WILL OVERRIDE setOnDetect, setOnCancel AND setOnLoop
         quickSetOutput(textview, onOutput);
+        this.setOnLoop(new Runnable(){
+                String[] waiting = {loadingText+".", loadingText+"..", loadingText+"..."};
+                int waitingIndex = 0;
+
+                @Override
+                public void run(){
+                    if(waitingIndex >= waiting.length) waitingIndex = 0;
+                    textview.setText(waiting[waitingIndex]);
+                    waitingIndex++;
+                }
+            });
+        return this;
+    }
+    
+    public CommandTermux setLoading(final TextView textview){
+        return setLoading(textview, "waiting");
+    }
+    
+    public CommandTermux setLoading(final TextView textview, final String loadingText){
         this.setOnLoop(new Runnable(){
                 String[] waiting = {loadingText+".", loadingText+"..", loadingText+"..."};
                 int waitingIndex = 0;
