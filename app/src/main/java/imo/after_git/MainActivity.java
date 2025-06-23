@@ -23,6 +23,7 @@ public class MainActivity extends Activity
 {
 	TextView outputTxt;
     String repoPath = "";
+    String statusShort = "";
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -47,29 +48,29 @@ public class MainActivity extends Activity
 			@Override
 			public void onClick(View v){
 				repoPath = repoPathEdit.getText().toString().trim();
+                runGitStatus(repoPath, outputTxt, new Runnable(){
+                        @Override
+                        public void run(){
+                            String branchStatus = "";
+                            String workingDirStatus = "";
+                            
+                            int i = -1;
+                            for(String line : statusShort.trim().split("\n")){
+                                i++;
+                                
+                                if(i == 0){
+                                    branchStatus = line;
+                                    continue;
+                                }
+                                workingDirStatus = line;
+                            }
+
+                            pullBtn.setVisibility(branchStatus.contains("behind") ? View.VISIBLE : View.GONE);
+                            pushBtn.setVisibility(branchStatus.contains("ahead") ? View.VISIBLE : View.GONE);
+                            commitBtn.setVisibility(workingDirStatus.isEmpty() ? View.GONE : View.VISIBLE);
+                        }
+                    });
                 
-                Runnable onEnd = new Runnable(){
-                    @Override
-                    public void run(){
-                        String gitStatus = outputTxt.getText().toString();
-                        if(gitStatus.contains("nothing to commit")){
-                            commitBtn.setVisibility(View.GONE);
-                        }else{
-                            commitBtn.setVisibility(View.VISIBLE);
-                        }
-                        if(gitStatus.contains("branch is ahead of")){
-                            pushBtn.setVisibility(View.VISIBLE);
-                        }else{
-                            pushBtn.setVisibility(View.GONE);
-                        }
-                        if(gitStatus.contains("branch is behind of")){
-                            pullBtn.setVisibility(View.VISIBLE);
-                        }else{
-                            pullBtn.setVisibility(View.GONE);
-                        }
-                    }
-                };
-				runGitStatus(repoPath, outputTxt, onEnd);
 			}
 		});
         
@@ -104,25 +105,33 @@ public class MainActivity extends Activity
     protected void onResume() {
         super.onResume();
         outputTxt.setText("click status button to load repository folder");
+        statusShort = "";
     }
     
-    void runGitStatus(final String repoPath, final TextView outputTxt, final Runnable onEnd){
+    void runGitStatus(final String repoPath, final TextView outputTxt, final Runnable onStatusShort){
+        final String commandDivider = "LONG STATUS ABOVE. SHORT STATUS BELOW.";
         String command = "cd " + repoPath;
-        command += "\ngit status";
+        command += "\ngit status --long";
+        command += "\necho \""+ commandDivider+"\"";
+        command += "\ngit status --short --branch";
 
         new CommandTermux(command, MainActivity.this)
-            .quickSetOutputWithLoading(outputTxt, new Runnable(){
+            .setOnDetect(new Runnable(){
                 @Override
                 public void run(){
-                    onEnd.run();
-                    
                     String output = CommandTermux.getOutput();
-                    boolean isWorking = output.contains("On branch");
-                    if(! isWorking) fixGit(output, repoPath);
+                    String[] outputParts = output.split(commandDivider);
+                    
+                    String statusLong = outputParts[0];
+                    statusShort = outputParts[1];
+                    
+                    outputTxt.setText(statusLong);
+                    onStatusShort.run();
                 }
             })
             .run();
     }
+    
     
     AlertDialog commitDialog(final String repoPath){
         String title = "Commit";
