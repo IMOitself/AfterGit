@@ -110,24 +110,15 @@ public class MainActivity extends Activity
         String command = "cd " + repoPath;
         command += "\ngit status";
 
-        outputTxt.setText("wait..");
         new CommandTermux(command, MainActivity.this)
-            .setOnDetect(new Runnable(){
+            .quickSetOutputWithLoading(outputTxt, new Runnable(){
                 @Override
                 public void run(){
-                    String output = CommandTermux.getOutput();
-                    outputTxt.setText(output);
                     onEnd.run();
-
+                    
+                    String output = CommandTermux.getOutput();
                     boolean isWorking = output.contains("On branch");
-
                     if(! isWorking) fixGit(output, repoPath);
-                }
-            })
-            .setOnCancel(new Runnable(){
-                @Override
-                public void run(){
-                    outputTxt.setText("try again");
                 }
             })
             .run();
@@ -156,12 +147,7 @@ public class MainActivity extends Activity
         String command = "cd " + repoPath;
         command += "\ngit status -s";
         new CommandTermux(command, MainActivity.this)
-            .setOnDetect(new Runnable(){
-                @Override
-                public void run(){
-                    changesText.setText(CommandTermux.getOutput());
-                }
-            })
+            .quickSetOutput(changesText)
             .run();
         
         return new AlertDialog.Builder(MainActivity.this)
