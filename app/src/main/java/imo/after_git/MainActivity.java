@@ -48,7 +48,7 @@ public class MainActivity extends Activity
 			@Override
 			public void onClick(View v){
 				repoPath = repoPathEdit.getText().toString().trim();
-                runGitStatus(repoPath, outputTxt, new Runnable(){
+                runGitStatus(repoPath, outputTxt, /* on status short */new Runnable(){
                         @Override
                         public void run(){
                             String branchStatus = "";
@@ -120,6 +120,16 @@ public class MainActivity extends Activity
                 @Override
                 public void run(){
                     String output = CommandTermux.getOutput();
+                    
+                    if(output.contains("cd: can't cd")){
+                        outputTxt.setText("not a folder path");
+                        return;
+                    }
+                    if(output.contains("fatal: not a git repository")){
+                        outputTxt.setText("not a git repository");
+                        return;
+                    }
+                    
                     String[] outputParts = output.split(commandDivider);
                     
                     String statusLong = outputParts[0];
@@ -131,7 +141,6 @@ public class MainActivity extends Activity
             })
             .run();
     }
-    
     
     AlertDialog commitDialog(final String repoPath){
         String title = "Commit";
