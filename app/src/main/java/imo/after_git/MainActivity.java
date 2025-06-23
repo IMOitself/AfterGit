@@ -7,17 +7,18 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import imo.after_run.CommandTermux;
-import android.widget.LinearLayout;
-import java.io.File;
-import android.widget.CheckBox;
+import java.util.Arrays;
 
 public class MainActivity extends Activity 
 {
@@ -167,15 +168,15 @@ public class MainActivity extends Activity
     }
     
     AlertDialog commitDialog(final String repoPath){
-        String title = "Commit";
+        String title = "Commit Changes";
         LinearLayout layout = new LinearLayout(MainActivity.this);
-        final TextView changesText = new TextView(this);
+        ListView changesList = changesList(repoPath);
         EditText commitMessageEdit = new EditText(this);
         CheckBox amendCheckbox = new CheckBox(this);
         CheckBox stageAllFilesCheckbox = new CheckBox(this);
         
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.addView(changesText);
+        layout.addView(changesList);
         layout.addView(commitMessageEdit);
         layout.addView(amendCheckbox);
         layout.addView(stageAllFilesCheckbox);
@@ -185,12 +186,6 @@ public class MainActivity extends Activity
         stageAllFilesCheckbox.setText("Stage all files");
         stageAllFilesCheckbox.setChecked(true);
         stageAllFilesCheckbox.setEnabled(false);// cannot be change
-        
-        String command = "cd " + repoPath;
-        command += "\ngit status -s";
-        new CommandTermux(command, MainActivity.this)
-            .quickSetOutput(changesText)
-            .run();
         
         return new AlertDialog.Builder(MainActivity.this)
             .setTitle(title)
@@ -208,6 +203,20 @@ public class MainActivity extends Activity
                 }
             })
             .create();
+    }
+    
+    ListView changesList(String repoPath){
+        final ListView listview = new ListView(this);
+        
+        String[] statusShortParts = statusShort.trim().split("\n");
+        String[] modifiedFiles = Arrays.copyOfRange(statusShortParts, 1, statusShortParts.length);
+
+        listview.setAdapter(new ArrayAdapter<>(
+                                MainActivity.this,
+                                android.R.layout.simple_list_item_1,
+                                modifiedFiles
+                            ));
+        return listview;
     }
     
     void fixGit(final String output, String repoPath){
