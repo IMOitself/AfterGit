@@ -33,16 +33,42 @@ public class MainActivity extends Activity
 		
 		final EditText repoPathEdit = findViewById(R.id.repo_path_edittext);
 		final Button repoLoadBtn = findViewById(R.id.repo_load_btn);
+        final Button commitBtn = findViewById(R.id.commit_btn);
+        final Button pullBtn = findViewById(R.id.pull_btn);
+        final Button pushBtn = findViewById(R.id.push_btn);
 		outputTxt = findViewById(R.id.output_txt);
 		outputTxt.setMovementMethod(new ScrollingMovementMethod());
+        //TODO: hide commit, pull and push button initially
         
 		repoLoadBtn.setOnClickListener(new View.OnClickListener(){
 			@Override
 			public void onClick(View v){
 				final String repoPath = repoPathEdit.getText().toString().trim();
 				runGitStatus(repoPath, outputTxt);
+                //TODO: show commit, pull and push button only if needed
 			}
 		});
+        
+        commitBtn.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    //TODO: Show dialog with change list, edit commit message and commit button
+                }
+            });
+            
+        pullBtn.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    //TODO: run git pull if repo has commits behind
+                }
+            });
+            
+        pushBtn.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    //TODO: run git push if repo has commits ahead
+                }
+            });
     }
 
     @Override
