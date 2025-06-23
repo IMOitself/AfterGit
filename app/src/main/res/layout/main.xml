@@ -33,8 +33,7 @@
 		android:layout_height="wrap_content"
 		android:text="Output:"
 		android:id="@+id/output_txt"
-		android:textIsSelectable="true"
-		android:layout_weight="1.0"/>
+		android:textIsSelectable="true"/>
 
 	<LinearLayout
 		android:orientation="horizontal"

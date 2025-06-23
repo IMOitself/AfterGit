@@ -37,7 +37,6 @@ public class MainActivity extends Activity
         final Button pullBtn = findViewById(R.id.pull_btn);
         final Button pushBtn = findViewById(R.id.push_btn);
 		outputTxt = findViewById(R.id.output_txt);
-		outputTxt.setMovementMethod(new ScrollingMovementMethod());
         //TODO: hide commit, pull and push button initially
         
 		repoLoadBtn.setOnClickListener(new View.OnClickListener(){
