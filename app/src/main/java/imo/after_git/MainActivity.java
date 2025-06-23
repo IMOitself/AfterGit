@@ -32,14 +32,14 @@ public class MainActivity extends Activity
         
 		
 		final EditText repoPathEdit = findViewById(R.id.repo_path_edittext);
-		final Button repoLoadBtn = findViewById(R.id.repo_load_btn);
+		final Button statusBtn = findViewById(R.id.status_btn);
         final Button commitBtn = findViewById(R.id.commit_btn);
         final Button pullBtn = findViewById(R.id.pull_btn);
         final Button pushBtn = findViewById(R.id.push_btn);
 		outputTxt = findViewById(R.id.output_txt);
         //TODO: hide commit, pull and push button initially
         
-		repoLoadBtn.setOnClickListener(new View.OnClickListener(){
+		statusBtn.setOnClickListener(new View.OnClickListener(){
 			@Override
 			public void onClick(View v){
 				final String repoPath = repoPathEdit.getText().toString().trim();
