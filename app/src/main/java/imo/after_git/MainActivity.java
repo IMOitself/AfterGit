@@ -49,6 +49,10 @@ public class MainActivity extends Activity
 		statusBtn.setOnClickListener(new View.OnClickListener(){
 			@Override
 			public void onClick(View v){
+                commitBtn.setVisibility(View.GONE);
+                pullBtn.setVisibility(View.GONE);
+                pushBtn.setVisibility(View.GONE);
+                
 				repoPath = repoPathEdit.getText().toString().trim();
                 runGitStatus(repoPath, outputTxt, /* on status short */new Runnable(){
                         @Override
