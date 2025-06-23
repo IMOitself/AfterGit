@@ -46,21 +46,24 @@
 			style="?android:attr/buttonBarButtonStyle"
 			android:layout_height="wrap_content"
 			android:text="Commit"
-			android:id="@+id/commit_btn"/>
+			android:id="@+id/commit_btn"
+			android:layout_weight="1.0"/>
 
 		<Button
 			android:layout_width="wrap_content"
 			style="?android:attr/buttonBarButtonStyle"
 			android:layout_height="wrap_content"
 			android:text="Pull"
-			android:id="@+id/pull_btn"/>
+			android:id="@+id/pull_btn"
+			android:layout_weight="1.0"/>
 
 		<Button
 			android:layout_width="wrap_content"
 			style="?android:attr/buttonBarButtonStyle"
 			android:layout_height="wrap_content"
 			android:text="Push"
-			android:id="@+id/push_btn"/>
+			android:id="@+id/push_btn"
+			android:layout_weight="1.0"/>
 
 	</LinearLayout>
 
