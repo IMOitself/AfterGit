@@ -80,7 +80,7 @@ public class MainActivity extends Activity
     @Override
     protected void onResume() {
         super.onResume();
-        outputTxt.setText("click load button");
+        outputTxt.setText("click status button to load repository folder");
     }
     
     void runGitStatus(final String repoPath, final TextView outputTxt){
