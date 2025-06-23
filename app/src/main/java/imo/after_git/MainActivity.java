@@ -126,7 +126,7 @@ public class MainActivity extends Activity
         command += "\ngit status --short --branch";
 
         new CommandTermux(command, MainActivity.this)
-            .setOnDetect(new Runnable(){
+            .setOnEnd(new Runnable(){
                 @Override
                 public void run(){
                     String output = CommandTermux.getOutput();
@@ -149,6 +149,7 @@ public class MainActivity extends Activity
                     onStatusShort.run();
                 }
             })
+            .setLoading(outputTxt)
             .run();
     }
     
