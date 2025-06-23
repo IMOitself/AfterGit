@@ -21,9 +21,11 @@ import android.widget.CheckBox;
 
 public class MainActivity extends Activity 
 {
+    Button statusBtn;
 	TextView outputTxt;
     String repoPath = "";
     String statusShort = "";
+    boolean isStop = false;
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -35,7 +37,7 @@ public class MainActivity extends Activity
         
 		
 		final EditText repoPathEdit = findViewById(R.id.repo_path_edittext);
-		final Button statusBtn = findViewById(R.id.status_btn);
+		statusBtn = findViewById(R.id.status_btn);
         final Button commitBtn = findViewById(R.id.commit_btn);
         final Button pullBtn = findViewById(R.id.pull_btn);
         final Button pushBtn = findViewById(R.id.push_btn);
@@ -104,8 +106,16 @@ public class MainActivity extends Activity
     @Override
     protected void onResume() {
         super.onResume();
-        outputTxt.setText("click status button to load repository folder");
-        statusShort = "";
+        if(!isStop) return;
+        
+        //update status
+        statusBtn.performClick();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        isStop = true;
     }
     
     void runGitStatus(final String repoPath, final TextView outputTxt, final Runnable onStatusShort){
