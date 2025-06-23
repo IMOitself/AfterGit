@@ -17,10 +17,12 @@ import android.widget.Toast;
 import imo.after_run.CommandTermux;
 import android.widget.LinearLayout;
 import java.io.File;
+import android.widget.CheckBox;
 
 public class MainActivity extends Activity 
 {
 	TextView outputTxt;
+    String repoPath = "";
 	
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -42,7 +44,7 @@ public class MainActivity extends Activity
 		statusBtn.setOnClickListener(new View.OnClickListener(){
 			@Override
 			public void onClick(View v){
-				final String repoPath = repoPathEdit.getText().toString().trim();
+				repoPath = repoPathEdit.getText().toString().trim();
 				runGitStatus(repoPath, outputTxt);
                 //TODO: show commit, pull and push button only if needed
 			}
@@ -52,20 +54,25 @@ public class MainActivity extends Activity
                 @Override
                 public void onClick(View v){
                     //TODO: Show dialog with change list, edit commit message and commit button
+                    commitDialog(repoPath).show();
                 }
             });
             
         pullBtn.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v){
-                    //TODO: run git pull if repo has commits behind
+                    //TODO: run git pull only if repo has commits behind
+                    if(repoPath.isEmpty()) return;
+                    
                 }
             });
             
         pushBtn.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v){
-                    //TODO: run git push if repo has commits ahead
+                    //TODO: run git push only if repo has commits ahead
+                    if(repoPath.isEmpty()) return;
+                    
                 }
             });
     }
@@ -100,6 +107,55 @@ public class MainActivity extends Activity
                 }
             })
             .run();
+    }
+    
+    AlertDialog commitDialog(final String repoPath){
+        String title = "Commit";
+        LinearLayout layout = new LinearLayout(MainActivity.this);
+        final TextView changesText = new TextView(this);
+        EditText commitMessageEdit = new EditText(this);
+        CheckBox amendCheckbox = new CheckBox(this);
+        CheckBox stageAllFilesCheckbox = new CheckBox(this);
+        
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.addView(changesText);
+        layout.addView(commitMessageEdit);
+        layout.addView(amendCheckbox);
+        layout.addView(stageAllFilesCheckbox);
+        
+        commitMessageEdit.setHint("commit message...");
+        amendCheckbox.setText("Amend previous commit");
+        stageAllFilesCheckbox.setText("Stage all files");
+        stageAllFilesCheckbox.setChecked(true);
+        stageAllFilesCheckbox.setEnabled(false);// cannot be change
+        
+        String command = "cd " + repoPath;
+        command += "\ngit status -s";
+        new CommandTermux(command, MainActivity.this)
+            .setOnDetect(new Runnable(){
+                @Override
+                public void run(){
+                    changesText.setText(CommandTermux.getOutput());
+                }
+            })
+            .run();
+        
+        return new AlertDialog.Builder(MainActivity.this)
+            .setTitle(title)
+            .setView(layout)
+            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dia, int which) {
+                    dia.dismiss();
+                }
+            })
+            .setPositiveButton("Commit", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dia, int which) {
+                    
+                }
+            })
+            .create();
     }
     
     void fixGit(final String output, String repoPath){
