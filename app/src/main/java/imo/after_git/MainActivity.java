@@ -186,7 +186,7 @@ public class MainActivity extends Activity
         LinearLayout layout = new LinearLayout(this);
         ListView changesList = new ListView(this);
         final EditText commitMessageEdit = new EditText(this);
-        CheckBox amendCheckbox = new CheckBox(this);
+        final CheckBox amendCheckbox = new CheckBox(this);
         CheckBox stageAllFilesCheckbox = new CheckBox(this);
         
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -244,6 +244,7 @@ public class MainActivity extends Activity
                 String command = "cd " + repoPath;
                 command += "\ngit add .";
                 command += "\ngit commit -m '"+commitMessage+"'";
+                if(amendCheckbox.isChecked()) command += " --amend --allow-empty";
 
                 new CommandTermux(command, MainActivity.this)
                     .setOnEnd(new Runnable(){
