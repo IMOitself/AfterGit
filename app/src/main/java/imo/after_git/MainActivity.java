@@ -274,9 +274,11 @@ public class MainActivity extends Activity
     AlertDialog makeDiffDialog(final String repoPath, final String filePath){
         String title = "Diff";
         TextView textview = new TextView(this);
+        textview.setTextSize(14);
+        textview.setTypeface(Typeface.MONOSPACE);
 
         String command = "cd " + repoPath;
-        command += "\ngit diff " + filePath;
+        command += "\ngit diff " + filePath + " | sed -n '/^@@/,$p'";
         
         new CommandTermux(command, MainActivity.this)
             .quickSetOutputWithLoading(textview)
@@ -287,7 +289,8 @@ public class MainActivity extends Activity
             .setPositiveButton("Close", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dia, int which) {
-
+                    
+                    
                 }
             })
             .create();
