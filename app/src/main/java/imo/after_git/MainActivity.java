@@ -28,6 +28,7 @@ public class MainActivity extends Activity
     String repoPath = "";
     boolean isStop = false;
     boolean canRefreshStatus = false;
+    AlertDialog commitDialog;
     
     static class gitStatusShort {
         static String branchStatus = "";
@@ -82,7 +83,8 @@ public class MainActivity extends Activity
         commitBtn.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v){
-                    commitDialog(repoPath, gitStatusShort.filesStatus).show();
+                    commitDialog = makeCommitDialog(repoPath, gitStatusShort.filesStatus);
+                    commitDialog.show();
                 }
             });
             
@@ -118,6 +120,8 @@ public class MainActivity extends Activity
     protected void onStop() {
         super.onStop();
         isStop = true;
+        if(commitDialog != null && commitDialog.isShowing())
+            commitDialog.dismiss();
     }
     
     void runGitStatus(final String repoPath, final TextView outputTxt, final Runnable onEnd){
@@ -167,7 +171,7 @@ public class MainActivity extends Activity
         return true;
     }
     
-    AlertDialog commitDialog(final String repoPath, String[] changes){
+    AlertDialog makeCommitDialog(final String repoPath, String[] changes){
         String title = "Commit Changes";
         LinearLayout layout = new LinearLayout(MainActivity.this);
         ListView changesList = new ListView(this);
