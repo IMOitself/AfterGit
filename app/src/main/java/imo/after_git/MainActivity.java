@@ -200,51 +200,60 @@ public class MainActivity extends Activity
         stageAllFilesCheckbox.setChecked(true);
         stageAllFilesCheckbox.setEnabled(false);// cannot be change
         
-        return new AlertDialog.Builder(MainActivity.this)
+        final AlertDialog commitDialog = new AlertDialog.Builder(MainActivity.this)
             .setTitle(title)
             .setView(layout)
-            .setCancelable(false)
             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dia, int which) {
                     dia.dismiss();
                 }
             })
-            .setPositiveButton("Commit", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(final DialogInterface dia, int which) {
-                    String commitMessage = commitMessageEdit.getText().toString();
-                    if(commitMessage.trim().isEmpty()) {
-                        Toast.makeText(MainActivity.this, "Enter commit message", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    String command = "cd " + repoPath;
-                    command += "\ngit add .";
-                    command += "\ngit commit -m '"+commitMessage+"'";
-
-                    new CommandTermux(command, MainActivity.this)
-                        .setOnEnd(new Runnable(){
-                            @Override
-                            public void run(){
-                                String output = CommandTermux.getOutput();
-
-                                if(output.contains("fatal: unable to auto-detect")){
-                                    Toast.makeText(MainActivity.this, "configure user name and user email first:D", Toast.LENGTH_SHORT).show();
-                                    configDialog = makeConfigDialog(repoPath);
-                                    configDialog.show();
-                                    return;
-                                }
-                                
-                                MainActivity.this.onStop();// set for refreshing
-                                MainActivity.this.onResume();// refresh status
-                                dia.dismiss();
-                            }
-                        })
-                        .run();
-                }
-            })
+            .setPositiveButton("Commit", null)
             .create();
+        
+        final View.OnClickListener positiveButtonOnClick = new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                String commitMessage = commitMessageEdit.getText().toString();
+                if(commitMessage.trim().isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Enter commit message", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                String command = "cd " + repoPath;
+                command += "\ngit add .";
+                command += "\ngit commit -m '"+commitMessage+"'";
+
+                new CommandTermux(command, MainActivity.this)
+                    .setOnEnd(new Runnable(){
+                        @Override
+                        public void run(){
+                            String output = CommandTermux.getOutput();
+
+                            if(output.contains("fatal: unable to auto-detect")){
+                                Toast.makeText(MainActivity.this, "configure user name and user email first:D", Toast.LENGTH_SHORT).show();
+                                configDialog = makeConfigDialog(repoPath);
+                                configDialog.show();
+                                return;
+                            }
+
+                            MainActivity.this.onStop();// set for refreshing
+                            MainActivity.this.onResume();// refresh status
+                            commitDialog.dismiss();
+                        }
+                    })
+                    .run();
+            }
+        };
+        
+        commitDialog.setOnShowListener(new DialogInterface.OnShowListener(){
+            @Override
+            public void onShow(final DialogInterface dia){
+                commitDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(positiveButtonOnClick);
+            }
+        });
+        return commitDialog;
     }
     
     public class CommitChangesAdapter extends ArrayAdapter<String> {
