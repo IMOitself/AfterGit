@@ -179,7 +179,7 @@ public class MainActivity extends Activity
         String title = "Commit Changes";
         LinearLayout layout = new LinearLayout(MainActivity.this);
         ListView changesList = new ListView(this);
-        EditText commitMessageEdit = new EditText(this);
+        final EditText commitMessageEdit = new EditText(this);
         CheckBox amendCheckbox = new CheckBox(this);
         CheckBox stageAllFilesCheckbox = new CheckBox(this);
         
@@ -207,8 +207,33 @@ public class MainActivity extends Activity
             })
             .setPositiveButton("Commit", new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dia, int which) {
-                    
+                public void onClick(final DialogInterface dia, int which) {
+                    String commitMessage = commitMessageEdit.getText().toString();
+                    if(commitMessage.trim().isEmpty()) {
+                        Toast.makeText(MainActivity.this, "Enter commit message", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    String command = "cd " + repoPath;
+                    command += "\ngit commit -m '"+commitMessage+"'";
+
+                    new CommandTermux(command, MainActivity.this)
+                        .setOnEnd(new Runnable(){
+                            @Override
+                            public void run(){
+                                String output = CommandTermux.getOutput();
+
+                                if(output.contains("fatal: unable to auto-detect")){
+                                    //TODO: configure user name and user email
+                                    Toast.makeText(MainActivity.this, "configure user name and user email first:D", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+
+                                MainActivity.this.onStop();// refresh status
+                                dia.dismiss();
+                            }
+                        })
+                        .run();
                 }
             })
             .create();
