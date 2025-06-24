@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -22,7 +23,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import imo.after_run.CommandTermux;
 import java.util.Arrays;
-import android.widget.CompoundButton;
 
 public class MainActivity extends Activity 
 {
@@ -277,63 +277,6 @@ public class MainActivity extends Activity
         return commitDialog;
     }
     
-    public class CommitChangesAdapter extends ArrayAdapter<String> {
-        
-        String repoPath = "";
-        
-        public CommitChangesAdapter(Context context, String repoPath, String[] changes) {
-            super(context, 0, changes);
-            this.repoPath = repoPath;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            TextView textview;
-
-            if (convertView != null) return (TextView) convertView;
-            
-            textview = new TextView(getContext());
-            textview.setPadding(32, 32, 32, 32);
-            textview.setTypeface(Typeface.MONOSPACE);
-
-            String item = getItem(position);
-
-            if(item == null && item.isEmpty()) return textview;
-            
-            String fileStateString = item.substring(0, 2).trim();
-            final char fileState = fileStateString.charAt(0);
-            final String filePath = item.substring(2);
-            
-            String htmlString = "";
-            
-            switch (fileState) {
-                case 'M':
-                    htmlString = "<font color='#0C4EA2'>M</font> " + filePath;
-                    break;
-                case '?':
-                    htmlString = "<font color='#20883D'>+</font> " + filePath;
-                    break;
-                case 'D':
-                    htmlString = "<font color='#20883D'>-</font> " + filePath;
-                    break;
-                default:
-                    htmlString = filePath;
-                    break;
-            }
-
-            textview.setText(Html.fromHtml(htmlString));
-            textview.setOnClickListener(new View.OnClickListener(){
-                    @Override
-                    public void onClick(View v){
-                        diffDialog = makeDiffDialog(repoPath, filePath);
-                        diffDialog.show();
-                    }
-                });
-
-            return textview;
-        }
-    }
-    
     AlertDialog makeDiffDialog(final String repoPath, final String filePath){
         String title = "Diff";
         ScrollView scrollView = new ScrollView(this);
@@ -470,5 +413,65 @@ public class MainActivity extends Activity
                 }
             })
             .create().show();
+    }
+    
+    
+    
+    
+    public class CommitChangesAdapter extends ArrayAdapter<String> {
+
+        String repoPath = "";
+
+        public CommitChangesAdapter(Context context, String repoPath, String[] changes) {
+            super(context, 0, changes);
+            this.repoPath = repoPath;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            TextView textview;
+
+            if (convertView != null) return (TextView) convertView;
+
+            textview = new TextView(getContext());
+            textview.setPadding(32, 32, 32, 32);
+            textview.setTypeface(Typeface.MONOSPACE);
+
+            String item = getItem(position);
+
+            if(item == null && item.isEmpty()) return textview;
+
+            String fileStateString = item.substring(0, 2).trim();
+            final char fileState = fileStateString.charAt(0);
+            final String filePath = item.substring(2);
+
+            String htmlString = "";
+
+            switch (fileState) {
+                case 'M':
+                    htmlString = "<font color='#0C4EA2'>M</font> " + filePath;
+                    break;
+                case '?':
+                    htmlString = "<font color='#20883D'>+</font> " + filePath;
+                    break;
+                case 'D':
+                    htmlString = "<font color='#20883D'>-</font> " + filePath;
+                    break;
+                default:
+                    htmlString = filePath;
+                    break;
+            }
+
+            textview.setText(Html.fromHtml(htmlString));
+            textview.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v){
+                        diffDialog = makeDiffDialog(repoPath, filePath);
+                        diffDialog.show();
+                    }
+                });
+
+            return textview;
+        }
     }
 }
