@@ -17,6 +17,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import imo.after_run.CommandTermux;
@@ -315,9 +316,13 @@ public class MainActivity extends Activity
     
     AlertDialog makeDiffDialog(final String repoPath, final String filePath){
         String title = "Diff";
+        ScrollView scrollView = new ScrollView(this);
         final TextView textview = new TextView(this);
+        
+        scrollView.addView(textview);
         textview.setTextSize(14);
         textview.setTypeface(Typeface.MONOSPACE);
+        textview.setTextIsSelectable(true);
 
         String command = "cd " + repoPath;
         command += "\ngit diff HEAD -- " + filePath + " | sed -n '/^@@/,$p'";
@@ -353,7 +358,7 @@ public class MainActivity extends Activity
             .run();
         return new AlertDialog.Builder(MainActivity.this)
             .setTitle(title)
-            .setView(textview)
+            .setView(scrollView)
             .setPositiveButton("Close", null)
             .create();
     }
