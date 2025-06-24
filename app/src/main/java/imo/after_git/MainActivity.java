@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import imo.after_run.CommandTermux;
 import java.util.Arrays;
+import android.widget.CompoundButton;
 
 public class MainActivity extends Activity 
 {
@@ -201,6 +202,7 @@ public class MainActivity extends Activity
         stageAllFilesCheckbox.setChecked(true);
         stageAllFilesCheckbox.setEnabled(false);// cannot be change
         
+        
         final AlertDialog commitDialog = new AlertDialog.Builder(MainActivity.this)
             .setTitle(title)
             .setView(layout)
@@ -213,6 +215,23 @@ public class MainActivity extends Activity
             .setPositiveButton("Commit", null)
             .create();
         
+        amendCheckbox.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
+            @Override
+            public void onCheckedChanged(CompoundButton v, boolean isChecked){
+                if(! isChecked){
+                    commitMessageEdit.setText("");
+                    return;
+                }
+                String command = "cd " + repoPath;
+                command += "\ngit log -1 --pretty=%B";
+                
+                new CommandTermux(command, MainActivity.this)
+                    .quickSetOutputWithLoading(commitMessageEdit)
+                    .setLoading(commitMessageEdit)
+                    .run();
+            }
+        });
+            
         final View.OnClickListener positiveButtonOnClick = new View.OnClickListener(){
             @Override
             public void onClick(View v){
