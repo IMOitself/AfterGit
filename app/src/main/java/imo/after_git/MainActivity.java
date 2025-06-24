@@ -112,9 +112,7 @@ public class MainActivity extends Activity
     protected void onResume() {
         super.onResume();
         if(!isStop || !canRefreshStatus) return;
-        
-        //update status
-        statusBtn.performClick();
+        statusBtn.performClick();//refresh status
     }
 
     @Override
@@ -245,13 +243,13 @@ public class MainActivity extends Activity
             
             switch (fileState) {
                 case 'M':
-                    htmlString = "<font color='#0000FF'>M</font> " + filePath;
+                    htmlString = "<font color='#0C4EA2'>M</font> " + filePath;
                     break;
                 case '?':
-                    htmlString = "<font color='#008000'>+</font> " + filePath;
+                    htmlString = "<font color='#20883D'>+</font> " + filePath;
                     break;
                 case 'D':
-                    htmlString = "<font color='#FF0000'>-</font> " + filePath;
+                    htmlString = "<font color='#20883D'>-</font> " + filePath;
                     break;
                 default:
                     htmlString = filePath;
@@ -273,7 +271,7 @@ public class MainActivity extends Activity
     
     AlertDialog makeDiffDialog(final String repoPath, final String filePath){
         String title = "Diff";
-        TextView textview = new TextView(this);
+        final TextView textview = new TextView(this);
         textview.setTextSize(14);
         textview.setTypeface(Typeface.MONOSPACE);
 
@@ -281,7 +279,33 @@ public class MainActivity extends Activity
         command += "\ngit diff " + filePath + " | sed -n '/^@@/,$p'";
         
         new CommandTermux(command, MainActivity.this)
-            .quickSetOutputWithLoading(textview)
+            .setOnEnd(new Runnable(){
+                @Override
+                public void run(){
+                    String output = CommandTermux.getOutput();
+                    
+                    String htmlString = "";
+                    
+                    for(String line : output.trim().split("\n")){
+                        String backgroundColor = "";
+                        if(line.startsWith("@@")) backgroundColor = "#DDF3FE";
+                        if(line.startsWith("+")) backgroundColor = "#DAFAE2";
+                        if(line.startsWith("-")) backgroundColor = "#FFEBEA";
+                        
+                        if(backgroundColor.isEmpty()){
+                            htmlString += line;
+                            htmlString += "<br>";
+                            continue;
+                        }
+                        
+                        htmlString += "<span style=\"background-color: "+backgroundColor+";\">"+line+"</span>";
+                        htmlString += "<br>";
+                    }
+                    
+                    textview.setText(Html.fromHtml(htmlString.trim()));
+                }
+            })
+            .setLoading(textview)
             .run();
         return new AlertDialog.Builder(MainActivity.this)
             .setTitle(title)
