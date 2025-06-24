@@ -29,6 +29,7 @@ public class MainActivity extends Activity
     boolean isStop = false;
     boolean canRefreshStatus = false;
     AlertDialog commitDialog;
+    AlertDialog diffDialog;
     
     static class gitStatusShort {
         static String branchStatus = "";
@@ -122,6 +123,9 @@ public class MainActivity extends Activity
         isStop = true;
         if(commitDialog != null && commitDialog.isShowing())
             commitDialog.dismiss();
+            
+        if(diffDialog != null && diffDialog.isShowing())
+            diffDialog.dismiss();
     }
     
     void runGitStatus(final String repoPath, final TextView outputTxt, final Runnable onEnd){
@@ -185,7 +189,7 @@ public class MainActivity extends Activity
         layout.addView(amendCheckbox);
         layout.addView(stageAllFilesCheckbox);
         
-        changesList.setAdapter(new CommitChangesAdapter(MainActivity.this, changes));
+        changesList.setAdapter(new CommitChangesAdapter(MainActivity.this, repoPath, changes));
         commitMessageEdit.setHint("commit message...");
         amendCheckbox.setText("Amend previous commit");
         stageAllFilesCheckbox.setText("Stage all files");
@@ -211,9 +215,12 @@ public class MainActivity extends Activity
     }
     
     public class CommitChangesAdapter extends ArrayAdapter<String> {
-
-        public CommitChangesAdapter(Context context, String[] changes) {
+        
+        String repoPath = "";
+        
+        public CommitChangesAdapter(Context context, String repoPath, String[] changes) {
             super(context, 0, changes);
+            this.repoPath = repoPath;
         }
 
         @Override
@@ -231,8 +238,8 @@ public class MainActivity extends Activity
             if(item == null && item.isEmpty()) return textview;
             
             String fileStateString = item.substring(0, 2).trim();
-            char fileState = fileStateString.charAt(0);
-            String filePath = item.substring(2);
+            final char fileState = fileStateString.charAt(0);
+            final String filePath = item.substring(2);
             
             String htmlString = "";
             
@@ -252,9 +259,38 @@ public class MainActivity extends Activity
             }
 
             textview.setText(Html.fromHtml(htmlString));
+            textview.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v){
+                        diffDialog = makeDiffDialog(repoPath, filePath);
+                        diffDialog.show();
+                    }
+                });
 
             return textview;
         }
+    }
+    
+    AlertDialog makeDiffDialog(final String repoPath, final String filePath){
+        String title = "Diff";
+        TextView textview = new TextView(this);
+
+        String command = "cd " + repoPath;
+        command += "\ngit diff " + filePath;
+        
+        new CommandTermux(command, MainActivity.this)
+            .quickSetOutputWithLoading(textview)
+            .run();
+        return new AlertDialog.Builder(MainActivity.this)
+            .setTitle(title)
+            .setView(textview)
+            .setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dia, int which) {
+
+                }
+            })
+            .create();
     }
     
     void fixGit(final String output, String repoPath){
