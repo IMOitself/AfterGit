@@ -311,7 +311,7 @@ public class MainActivity extends Activity
         textview.setTypeface(Typeface.MONOSPACE);
 
         String command = "cd " + repoPath;
-        command += "\ngit diff " + filePath + " | sed -n '/^@@/,$p'";
+        command += "\ngit diff HEAD -- " + filePath + " | sed -n '/^@@/,$p'";
         
         new CommandTermux(command, MainActivity.this)
             .setOnEnd(new Runnable(){
