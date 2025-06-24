@@ -30,6 +30,7 @@ public class MainActivity extends Activity
     boolean canRefreshStatus = false;
     AlertDialog commitDialog;
     AlertDialog diffDialog;
+    AlertDialog configDialog;
     
     static class gitStatusShort {
         static String branchStatus = "";
@@ -124,6 +125,9 @@ public class MainActivity extends Activity
             
         if(diffDialog != null && diffDialog.isShowing())
             diffDialog.dismiss();
+            
+        if(configDialog != null && configDialog.isShowing())
+            configDialog.dismiss();
     }
     
     void runGitStatus(final String repoPath, final TextView outputTxt, final Runnable onEnd){
@@ -177,7 +181,7 @@ public class MainActivity extends Activity
     
     AlertDialog makeCommitDialog(final String repoPath, String[] changes){
         String title = "Commit Changes";
-        LinearLayout layout = new LinearLayout(MainActivity.this);
+        LinearLayout layout = new LinearLayout(this);
         ListView changesList = new ListView(this);
         final EditText commitMessageEdit = new EditText(this);
         CheckBox amendCheckbox = new CheckBox(this);
@@ -199,6 +203,7 @@ public class MainActivity extends Activity
         return new AlertDialog.Builder(MainActivity.this)
             .setTitle(title)
             .setView(layout)
+            .setCancelable(false)
             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dia, int which) {
@@ -215,6 +220,7 @@ public class MainActivity extends Activity
                     }
 
                     String command = "cd " + repoPath;
+                    command += "\ngit add .";
                     command += "\ngit commit -m '"+commitMessage+"'";
 
                     new CommandTermux(command, MainActivity.this)
@@ -224,12 +230,14 @@ public class MainActivity extends Activity
                                 String output = CommandTermux.getOutput();
 
                                 if(output.contains("fatal: unable to auto-detect")){
-                                    //TODO: configure user name and user email
                                     Toast.makeText(MainActivity.this, "configure user name and user email first:D", Toast.LENGTH_SHORT).show();
+                                    configDialog = makeConfigDialog(repoPath);
+                                    configDialog.show();
                                     return;
                                 }
-
-                                MainActivity.this.onStop();// refresh status
+                                
+                                MainActivity.this.onStop();// set for refreshing
+                                MainActivity.this.onResume();// refresh status
                                 dia.dismiss();
                             }
                         })
@@ -337,11 +345,37 @@ public class MainActivity extends Activity
         return new AlertDialog.Builder(MainActivity.this)
             .setTitle(title)
             .setView(textview)
-            .setPositiveButton("Close", new DialogInterface.OnClickListener() {
+            .setPositiveButton("Close", null)
+            .create();
+    }
+    
+    AlertDialog makeConfigDialog(final String repoPath){
+        String title = "Configure Repository";
+        LinearLayout layout = new LinearLayout(this);
+        final EditText usernameEdit = new EditText(this);
+        final EditText emailEdit = new EditText(this);
+        
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.addView(usernameEdit);
+        layout.addView(emailEdit);
+        usernameEdit.setHint("user name...");
+        emailEdit.setHint("user email...");
+
+        return new AlertDialog.Builder(MainActivity.this)
+            .setTitle(title)
+            .setView(layout)
+            .setNegativeButton("Cancel", null)
+            .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dia, int which) {
+                    String username = usernameEdit.getText().toString();
+                    String email = emailEdit.getText().toString();
+                    String command = "cd " + repoPath;
+                    command += "\ngit config user.name \""+username+"\"";
+                    command += "\ngit config user.email \""+email+"\"";
                     
-                    
+                    new CommandTermux(command, MainActivity.this).run();
+                    dia.dismiss();
                 }
             })
             .create();
