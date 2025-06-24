@@ -6,7 +6,9 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -179,11 +181,7 @@ public class MainActivity extends Activity
         layout.addView(amendCheckbox);
         layout.addView(stageAllFilesCheckbox);
         
-        changesList.setAdapter(new ArrayAdapter<>(
-                                   MainActivity.this,
-                                   android.R.layout.simple_list_item_1,
-                                   gitStatusShort.filesStatus
-                               ));
+        changesList.setAdapter(new CommitChangesAdapter(MainActivity.this, changes));
         commitMessageEdit.setHint("commit message...");
         amendCheckbox.setText("Amend previous commit");
         stageAllFilesCheckbox.setText("Stage all files");
@@ -206,6 +204,53 @@ public class MainActivity extends Activity
                 }
             })
             .create();
+    }
+    
+    public class CommitChangesAdapter extends ArrayAdapter<String> {
+
+        public CommitChangesAdapter(Context context, String[] changes) {
+            super(context, 0, changes);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            TextView textview;
+
+            if (convertView != null) return (TextView) convertView;
+            
+            textview = new TextView(getContext());
+            textview.setPadding(32, 32, 32, 32);
+            textview.setTypeface(Typeface.MONOSPACE);
+
+            String item = getItem(position);
+
+            if(item == null && item.isEmpty()) return textview;
+            
+            String fileStateString = item.substring(0, 2).trim();
+            char fileState = fileStateString.charAt(0);
+            String filePath = item.substring(2);
+            
+            String htmlString = "";
+            
+            switch (fileState) {
+                case 'M':
+                    htmlString = "<font color='#0000FF'>M</font> " + filePath;
+                    break;
+                case '?':
+                    htmlString = "<font color='#008000'>+</font> " + filePath;
+                    break;
+                case 'D':
+                    htmlString = "<font color='#FF0000'>-</font> " + filePath;
+                    break;
+                default:
+                    htmlString = filePath;
+                    break;
+            }
+
+            textview.setText(Html.fromHtml(htmlString));
+
+            return textview;
+        }
     }
     
     void fixGit(final String output, String repoPath){
