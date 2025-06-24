@@ -138,6 +138,8 @@ public class MainActivity extends Activity
                 @Override
                 public void run(){
                     String output = CommandTermux.getOutput();
+                    boolean isWorking = output.contains("On branch");
+                    if(! isWorking) fixGit(output, repoPath);
                     
                     if(! isRepository(output, outputTxt)) return;
                     
