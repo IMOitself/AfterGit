@@ -304,6 +304,9 @@ public class MainActivity extends Activity
                         if(line.startsWith("+")) backgroundColor = "#DAFAE2";
                         if(line.startsWith("-")) backgroundColor = "#FFEBEA";
                         
+                        if(line.startsWith("+")) line = line.substring(1);
+                        if(line.startsWith("-")) line = line.substring(1);
+                        
                         if(backgroundColor.isEmpty()){
                             htmlString += line;
                             htmlString += "<br>";
