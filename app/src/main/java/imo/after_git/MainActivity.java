@@ -23,11 +23,14 @@ import java.util.Arrays;
 public class MainActivity extends Activity 
 {
     Button statusBtn;
-	TextView outputTxt;
     String repoPath = "";
-    String statusShort = "";
     boolean isStop = false;
     boolean canRefreshStatus = false;
+    
+    static class gitStatusShort {
+        static String branchStatus = "";
+        static String[] filesStatus = {};
+    }
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -43,7 +46,7 @@ public class MainActivity extends Activity
         final Button commitBtn = findViewById(R.id.commit_btn);
         final Button pullBtn = findViewById(R.id.pull_btn);
         final Button pushBtn = findViewById(R.id.push_btn);
-		outputTxt = findViewById(R.id.output_txt);
+		final TextView outputTxt = findViewById(R.id.output_txt);
         commitBtn.setVisibility(View.GONE);
         pullBtn.setVisibility(View.GONE);
         pushBtn.setVisibility(View.GONE);
@@ -56,37 +59,28 @@ public class MainActivity extends Activity
                 pushBtn.setVisibility(View.GONE);
                 
 				repoPath = repoPathEdit.getText().toString().trim();
-                runGitStatus(repoPath, outputTxt, /* on status short */new Runnable(){
-                        @Override
-                        public void run(){
-                            String branchStatus = "";
-                            String workingDirStatus = "";
-                            
-                            int i = -1;
-                            for(String line : statusShort.trim().split("\n")){
-                                i++;
-                                
-                                if(i == 0){
-                                    branchStatus = line;
-                                    continue;
-                                }
-                                workingDirStatus = line;
-                            }
-
-                            pullBtn.setVisibility(branchStatus.contains("behind") ? View.VISIBLE : View.GONE);
-                            pushBtn.setVisibility(branchStatus.contains("ahead") ? View.VISIBLE : View.GONE);
-                            commitBtn.setVisibility(workingDirStatus.isEmpty() ? View.GONE : View.VISIBLE);
-                        }
-                    });
                 
+                Runnable onEnd = new Runnable(){
+                    @Override
+                    public void run(){
+                        boolean doPull = gitStatusShort.branchStatus.contains("behind");
+                        boolean doPush = gitStatusShort.branchStatus.contains("ahead");
+                        boolean doCommit = gitStatusShort.filesStatus.length != 0;
+                        
+                        pullBtn.setVisibility(doPull ? View.VISIBLE : View.GONE);
+                        pushBtn.setVisibility(doPush ? View.VISIBLE : View.GONE);
+                        commitBtn.setVisibility(doCommit ? View.VISIBLE : View.GONE);
+                    }
+                };
+                
+                runGitStatus(repoPath, outputTxt, onEnd);
 			}
 		});
         
         commitBtn.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v){
-                    //TODO: Show dialog with change list, edit commit message and commit button
-                    commitDialog(repoPath).show();
+                    commitDialog(repoPath, gitStatusShort.filesStatus).show();
                 }
             });
             
@@ -124,7 +118,7 @@ public class MainActivity extends Activity
         isStop = true;
     }
     
-    void runGitStatus(final String repoPath, final TextView outputTxt, final Runnable onStatusShort){
+    void runGitStatus(final String repoPath, final TextView outputTxt, final Runnable onEnd){
         final String commandDivider = "LONG STATUS ABOVE. SHORT STATUS BELOW.";
         String command = "cd " + repoPath;
         command += "\ngit status --long";
@@ -142,10 +136,14 @@ public class MainActivity extends Activity
                     String[] outputParts = output.split(commandDivider);
                     
                     String statusLong = outputParts[0];
-                    statusShort = outputParts[1];
+                    String statusShort = outputParts[1];
+                    
+                    String[] statusShortParts = statusShort.trim().split("\n");
+                    gitStatusShort.branchStatus = statusShortParts[0];
+                    gitStatusShort.filesStatus = Arrays.copyOfRange(statusShortParts, 1, statusShortParts.length);
                     
                     outputTxt.setText(statusLong);
-                    onStatusShort.run();
+                    onEnd.run();
                 }
             })
             .setLoading(outputTxt)
@@ -154,12 +152,12 @@ public class MainActivity extends Activity
     
     boolean isRepository(String commandOutput, TextView textview){
         if(commandOutput.contains("cd: can't cd")){
-            outputTxt.setText("not a folder path");
+            textview.setText("not a folder path");
             canRefreshStatus = false;
             return false;
         }
         if(commandOutput.contains("fatal: not a git repository")){
-            outputTxt.setText("not a git repository");
+            textview.setText("not a git repository");
             canRefreshStatus = false;
             return false;
         }
@@ -167,10 +165,10 @@ public class MainActivity extends Activity
         return true;
     }
     
-    AlertDialog commitDialog(final String repoPath){
+    AlertDialog commitDialog(final String repoPath, String[] changes){
         String title = "Commit Changes";
         LinearLayout layout = new LinearLayout(MainActivity.this);
-        ListView changesList = changesList(repoPath);
+        ListView changesList = new ListView(this);
         EditText commitMessageEdit = new EditText(this);
         CheckBox amendCheckbox = new CheckBox(this);
         CheckBox stageAllFilesCheckbox = new CheckBox(this);
@@ -181,6 +179,11 @@ public class MainActivity extends Activity
         layout.addView(amendCheckbox);
         layout.addView(stageAllFilesCheckbox);
         
+        changesList.setAdapter(new ArrayAdapter<>(
+                                   MainActivity.this,
+                                   android.R.layout.simple_list_item_1,
+                                   gitStatusShort.filesStatus
+                               ));
         commitMessageEdit.setHint("commit message...");
         amendCheckbox.setText("Amend previous commit");
         stageAllFilesCheckbox.setText("Stage all files");
@@ -203,20 +206,6 @@ public class MainActivity extends Activity
                 }
             })
             .create();
-    }
-    
-    ListView changesList(String repoPath){
-        final ListView listview = new ListView(this);
-        
-        String[] statusShortParts = statusShort.trim().split("\n");
-        String[] modifiedFiles = Arrays.copyOfRange(statusShortParts, 1, statusShortParts.length);
-
-        listview.setAdapter(new ArrayAdapter<>(
-                                MainActivity.this,
-                                android.R.layout.simple_list_item_1,
-                                modifiedFiles
-                            ));
-        return listview;
     }
     
     void fixGit(final String output, String repoPath){
