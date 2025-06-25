@@ -263,7 +263,7 @@ public class MainActivity extends Activity
         final TextView textview = new TextView(this);
         
         scrollView.addView(textview);
-        textview.setTextSize(14);
+        textview.setTextSize(11);
         textview.setTypeface(Typeface.MONOSPACE);
         textview.setTextIsSelectable(true);
 
