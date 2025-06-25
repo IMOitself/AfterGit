@@ -258,9 +258,8 @@ public class MainActivity extends Activity
                                 configDialog.show();
                                 return;
                             }
-
-                            MainActivity.this.onStop();// set for refreshing
-                            MainActivity.this.onResume();// refresh status
+                            
+                            Toast.makeText(MainActivity.this, "successfully commited:D", Toast.LENGTH_SHORT).show();
                             commitDialog.dismiss();
                         }
                     })
