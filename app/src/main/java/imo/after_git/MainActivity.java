@@ -231,46 +231,18 @@ public class MainActivity extends Activity
                     .run();
             }
         });
-            
-        final View.OnClickListener positiveButtonOnClick = new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                String commitMessage = commitMessageEdit.getText().toString();
-                if(commitMessage.trim().isEmpty()) {
-                    Toast.makeText(MainActivity.this, "Enter commit message", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                String command = "cd " + repoPath;
-                command += "\ngit add .";
-                command += "\ngit commit -m '"+commitMessage+"'";
-                if(amendCheckbox.isChecked()) command += " --amend --allow-empty";
-
-                new CommandTermux(command, MainActivity.this)
-                    .setOnEnd(new Runnable(){
-                        @Override
-                        public void run(){
-                            String output = CommandTermux.getOutput();
-
-                            if(output.contains("fatal: unable to auto-detect")){
-                                Toast.makeText(MainActivity.this, "configure user name and user email first:D", Toast.LENGTH_SHORT).show();
-                                configDialog = makeConfigDialog(repoPath);
-                                configDialog.show();
-                                return;
-                            }
-                            
-                            Toast.makeText(MainActivity.this, "successfully commited:D", Toast.LENGTH_SHORT).show();
-                            commitDialog.dismiss();
-                        }
-                    })
-                    .run();
-            }
-        };
         
         commitDialog.setOnShowListener(new DialogInterface.OnShowListener(){
             @Override
             public void onShow(final DialogInterface dia){
-                commitDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(positiveButtonOnClick);
+                Button positiveButton = commitDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                positiveButton.setOnClickListener(new View.OnClickListener(){
+                        @Override
+                        public void onClick(View v){
+                            String commitMessage = commitMessageEdit.getText().toString();
+                            commit(commitMessage, amendCheckbox.isChecked());
+                        }
+                    });
             }
         });
         return commitDialog;
@@ -358,6 +330,37 @@ public class MainActivity extends Activity
                 }
             })
             .create();
+    }
+    
+    void commit(String commitMessage, boolean isAmend){
+        if(commitMessage.trim().isEmpty()) {
+            Toast.makeText(MainActivity.this, "Enter commit message", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String command = "cd " + repoPath;
+        command += "\ngit add .";
+        command += "\ngit commit -m '"+commitMessage+"'";
+        if(isAmend) command += " --amend --allow-empty";
+
+        new CommandTermux(command, MainActivity.this)
+            .setOnEnd(new Runnable(){
+                @Override
+                public void run(){
+                    String output = CommandTermux.getOutput();
+
+                    if(output.contains("fatal: unable to auto-detect")){
+                        Toast.makeText(MainActivity.this, "configure user name and user email first:D", Toast.LENGTH_SHORT).show();
+                        configDialog = makeConfigDialog(repoPath);
+                        configDialog.show();
+                        return;
+                    }
+
+                    Toast.makeText(MainActivity.this, "successfully commited:D", Toast.LENGTH_SHORT).show();
+                    commitDialog.dismiss();
+                }
+            })
+            .run();
     }
     
     void fixGit(final String output, String repoPath){
@@ -448,21 +451,11 @@ public class MainActivity extends Activity
             final String filePath = item.substring(2);
 
             String htmlString = "";
-
-            switch (fileState) {
-                case 'M':
-                    htmlString = "<font color='#0C4EA2'>M</font> " + filePath;
-                    break;
-                case '?':
-                    htmlString = "<font color='#20883D'>+</font> " + filePath;
-                    break;
-                case 'D':
-                    htmlString = "<font color='#20883D'>-</font> " + filePath;
-                    break;
-                default:
-                    htmlString = filePath;
-                    break;
-            }
+            
+            if(fileState == 'M') htmlString = "<font color='#0C4EA2'>M</font> " + filePath;
+            if(fileState == '?') htmlString = "<font color='#0C4EA2'>+</font> " + filePath;
+            if(fileState == 'D') htmlString = "<font color='#0C4EA2'>-</font> " + filePath;
+            if(htmlString.isEmpty()) htmlString = item;
 
             textview.setText(Html.fromHtml(htmlString));
             textview.setOnClickListener(new View.OnClickListener(){
