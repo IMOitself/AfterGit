@@ -136,6 +136,11 @@ public class MainActivity extends Activity
             fixGitDialog.dismiss();
     }
     
+    
+    
+    
+    
+    
     void runGitStatus(final String repoPath, final TextView outputTxt, final Runnable onEnd){
         final String commandDivider = "LONG STATUS ABOVE. SHORT STATUS BELOW.";
         String command = "cd " + repoPath;
@@ -278,6 +283,7 @@ public class MainActivity extends Activity
                     
                     String htmlString = "";
                     
+
                     for(String line : output.trim().split("\n")){
                         String backgroundColor = "";
                         if(line.startsWith("@@")) backgroundColor = "#DDF3FE";
@@ -286,6 +292,8 @@ public class MainActivity extends Activity
                         
                         if(line.startsWith("+")) line = line.substring(1);
                         if(line.startsWith("-")) line = line.substring(1);
+                        
+                        line = android.text.TextUtils.htmlEncode(line);
                         
                         if(backgroundColor.isEmpty()){
                             htmlString += line;
