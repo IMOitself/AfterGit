@@ -33,6 +33,7 @@ public class MainActivity extends Activity
     AlertDialog commitDialog;
     AlertDialog diffDialog;
     AlertDialog configDialog;
+    AlertDialog fixGitDialog;
     
     static class gitStatusShort {
         static String branchStatus = "";
@@ -130,6 +131,9 @@ public class MainActivity extends Activity
             
         if(configDialog != null && configDialog.isShowing())
             configDialog.dismiss();
+            
+        if(fixGitDialog != null && fixGitDialog.isShowing())
+            fixGitDialog.dismiss();
     }
     
     void runGitStatus(final String repoPath, final TextView outputTxt, final Runnable onEnd){
@@ -180,6 +184,11 @@ public class MainActivity extends Activity
         canRefreshStatus = true;
         return true;
     }
+    
+    
+    
+    
+    
     
     AlertDialog makeCommitDialog(final String repoPath, String[] changes){
         String title = "Commit Changes";
@@ -332,6 +341,49 @@ public class MainActivity extends Activity
             .create();
     }
     
+    AlertDialog makeFixGitDialog(String dialogTitle, String dialogMessage, String stringToCopy){
+        LinearLayout messageLayout = new LinearLayout(MainActivity.this);
+        TextView messageText = new TextView(MainActivity.this);
+        Button copyBtn = new Button(MainActivity.this);
+
+        messageText.setText(dialogMessage);
+        copyBtn.setText("Copy");
+        final String copyString = stringToCopy;
+
+        copyBtn.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    if (clipboard == null) return;
+                    clipboard.setPrimaryClip(ClipData.newPlainText("Copied Text", copyString));
+
+                    Toast.makeText(MainActivity.this, "Text copied to clipboard", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        messageLayout.setOrientation(LinearLayout.VERTICAL);
+        messageLayout.addView(messageText);
+        messageLayout.addView(copyBtn);
+
+        return new AlertDialog.Builder(MainActivity.this)
+            .setTitle(dialogTitle)
+            .setView(messageLayout)
+            .setPositiveButton("Open Termux", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dia, int which) {
+                    try {
+                        CommandTermux.openTermux(MainActivity.this);
+                    } catch(Exception e) {}
+                }
+            })
+            .create();
+    }
+    
+    
+    
+    
+    
+    
     void commit(String commitMessage, boolean isAmend){
         if(commitMessage.trim().isEmpty()) {
             Toast.makeText(MainActivity.this, "Enter commit message", Toast.LENGTH_SHORT).show();
@@ -383,42 +435,12 @@ public class MainActivity extends Activity
             return;
         }
         
-        LinearLayout messageLayout = new LinearLayout(MainActivity.this);
-        TextView messageText = new TextView(MainActivity.this);
-        Button copyBtn = new Button(MainActivity.this);
-
-        messageText.setText(dialogMessage);
-        copyBtn.setText("Copy");
-        final String copyString = stringToCopy;
-        
-        copyBtn.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v){
-                    ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                    if (clipboard == null) return;
-                    clipboard.setPrimaryClip(ClipData.newPlainText("Copied Text", copyString));
-
-                    Toast.makeText(MainActivity.this, "Text copied to clipboard", Toast.LENGTH_SHORT).show();
-                }
-            });
-
-        messageLayout.setOrientation(LinearLayout.VERTICAL);
-        messageLayout.addView(messageText);
-        messageLayout.addView(copyBtn);
-
-        new AlertDialog.Builder(MainActivity.this)
-            .setTitle(dialogTitle)
-            .setView(messageLayout)
-            .setPositiveButton("Open Termux", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dia, int which) {
-                    try {
-                        CommandTermux.openTermux(MainActivity.this);
-                    } catch(Exception e) {}
-                }
-            })
-            .create().show();
+        fixGitDialog = makeFixGitDialog(dialogTitle, dialogMessage, stringToCopy);
+        fixGitDialog.show();
     }
+    
+    
+    
     
     
     
