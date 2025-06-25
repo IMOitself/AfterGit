@@ -233,17 +233,8 @@ public class MainActivity extends Activity
         amendCheckbox.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
             @Override
             public void onCheckedChanged(CompoundButton v, boolean isChecked){
-                if(! isChecked){
-                    commitMessageEdit.setText("");
-                    return;
-                }
-                String command = "cd " + repoPath;
-                command += "\ngit log -1 --pretty=%B";
-                
-                new CommandTermux(command, MainActivity.this)
-                    .quickSetOutputWithLoading(commitMessageEdit)
-                    .setLoading(commitMessageEdit)
-                    .run();
+                if(! isChecked) commitMessageEdit.setText("");
+                if(isChecked) getLatestCommit(repoPath, commitMessageEdit);
             }
         });
         
@@ -419,6 +410,16 @@ public class MainActivity extends Activity
                     commitDialog.dismiss();
                 }
             })
+            .run();
+    }
+    
+    void getLatestCommit(String repoPath, TextView outputText){
+        String command = "cd " + repoPath;
+        command += "\ngit log -1 --pretty=%B";
+
+        new CommandTermux(command, MainActivity.this)
+            .quickSetOutputWithLoading(outputText)
+            .setLoading(outputText)
             .run();
     }
     
