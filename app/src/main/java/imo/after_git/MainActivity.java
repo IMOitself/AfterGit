@@ -24,6 +24,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import imo.after_run.CommandTermux;
 import java.util.Arrays;
+import android.widget.RelativeLayout;
+import java.io.PrintWriter;
+import java.io.OutputStream;
 
 public class MainActivity extends Activity 
 {
@@ -257,10 +260,26 @@ public class MainActivity extends Activity
     AlertDialog makeDiffDialog(final String repoPath, final String filePath){
         String title = "Diff";
         ScrollView scrollView = new ScrollView(this);
-        final LinearLayout textviewsLayout = new LinearLayout(this);
+        final RelativeLayout linesLayout = new RelativeLayout(this);
+        final LinearLayout lineBackgroundsLayout = new LinearLayout(this);
+        final TextView linesText = new TextView(this);
         
-        textviewsLayout.setOrientation(LinearLayout.VERTICAL);
-        scrollView.addView(textviewsLayout);
+        final int textSize = 11;
+        final Typeface typeface = Typeface.MONOSPACE;
+        
+        linesText.setTextSize(textSize);
+        linesText.setTypeface(typeface);
+        linesText.setTextIsSelectable(true);
+        linesText.setLayoutParams(new ViewGroup.LayoutParams(
+                                     ViewGroup.LayoutParams.MATCH_PARENT,
+                                     ViewGroup.LayoutParams.WRAP_CONTENT
+                                 ));
+        
+        lineBackgroundsLayout.setOrientation(LinearLayout.VERTICAL);
+        
+        linesLayout.addView(lineBackgroundsLayout);
+        linesLayout.addView(linesText);
+        scrollView.addView(linesLayout);
         
         String command = "cd " + repoPath;
         command += "\ngit diff HEAD -- " + filePath + " | sed -n '/^@@/,$p'";
@@ -270,7 +289,8 @@ public class MainActivity extends Activity
                 @Override
                 public void run(){
                     String output = CommandTermux.getOutput();
-                    
+
+                    linesText.setText("");
                     for (String line : output.trim().split("\n")) {
                         String backgroundColor = null;
 
@@ -281,25 +301,26 @@ public class MainActivity extends Activity
                         if(line.startsWith("+")) line = line.substring(1);
                         if(line.startsWith("-")) line = line.substring(1);
 
-                        final TextView textview = new TextView(MainActivity.this);
-                        textviewsLayout.addView(textview);
-                        
-                        textview.setText(line);
-                        textview.setTextSize(11);
-                        textview.setTypeface(Typeface.MONOSPACE);
-                        textview.setTextIsSelectable(true);
-                        textview.setLayoutParams(new LinearLayout.LayoutParams(
-                                               ViewGroup.LayoutParams.MATCH_PARENT,
-                                               ViewGroup.LayoutParams.WRAP_CONTENT
-                                           ));
-                        if (backgroundColor == null) continue;
-                        textview.setBackgroundColor(Color.parseColor(backgroundColor));
-                        
+                        final TextView lineBackground = new TextView(MainActivity.this);
+                        lineBackground.setText(line);
+                        lineBackground.setTextSize(textSize);
+                        lineBackground.setTypeface(typeface);
+                        lineBackground.setLayoutParams(new ViewGroup.LayoutParams(
+                                                           ViewGroup.LayoutParams.MATCH_PARENT,
+                                                           ViewGroup.LayoutParams.WRAP_CONTENT
+                                                       ));
+                        if (backgroundColor != null)
+                            lineBackground.setBackgroundColor(Color.parseColor(backgroundColor));
+
+                        lineBackgroundsLayout.addView(lineBackground);
+
+                        linesText.append(line+"\n");
                     }
                 }
             })
-            //.setLoading(textview)
+            .setLoading(linesText)
             .run();
+            
         return new AlertDialog.Builder(MainActivity.this)
             .setTitle(title)
             .setView(scrollView)
