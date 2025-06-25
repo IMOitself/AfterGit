@@ -6,6 +6,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Html;
@@ -265,13 +266,11 @@ public class MainActivity extends Activity
     AlertDialog makeDiffDialog(final String repoPath, final String filePath){
         String title = "Diff";
         ScrollView scrollView = new ScrollView(this);
-        final TextView textview = new TextView(this);
+        final LinearLayout textviewsLayout = new LinearLayout(this);
         
-        scrollView.addView(textview);
-        textview.setTextSize(11);
-        textview.setTypeface(Typeface.MONOSPACE);
-        textview.setTextIsSelectable(true);
-
+        textviewsLayout.setOrientation(LinearLayout.VERTICAL);
+        scrollView.addView(textviewsLayout);
+        
         String command = "cd " + repoPath;
         command += "\ngit diff HEAD -- " + filePath + " | sed -n '/^@@/,$p'";
         
@@ -281,34 +280,34 @@ public class MainActivity extends Activity
                 public void run(){
                     String output = CommandTermux.getOutput();
                     
-                    String htmlString = "";
-                    
+                    for (String line : output.trim().split("\n")) {
+                        String backgroundColor = null;
 
-                    for(String line : output.trim().split("\n")){
-                        String backgroundColor = "";
                         if(line.startsWith("@@")) backgroundColor = "#DDF3FE";
                         if(line.startsWith("+")) backgroundColor = "#DAFAE2";
                         if(line.startsWith("-")) backgroundColor = "#FFEBEA";
-                        
+
                         if(line.startsWith("+")) line = line.substring(1);
                         if(line.startsWith("-")) line = line.substring(1);
+
+                        final TextView textview = new TextView(MainActivity.this);
+                        textviewsLayout.addView(textview);
                         
-                        line = android.text.TextUtils.htmlEncode(line);
+                        textview.setText(line);
+                        textview.setTextSize(11);
+                        textview.setTypeface(Typeface.MONOSPACE);
+                        textview.setTextIsSelectable(true);
+                        textview.setLayoutParams(new LinearLayout.LayoutParams(
+                                               ViewGroup.LayoutParams.MATCH_PARENT,
+                                               ViewGroup.LayoutParams.WRAP_CONTENT
+                                           ));
+                        if (backgroundColor == null) continue;
+                        textview.setBackgroundColor(Color.parseColor(backgroundColor));
                         
-                        if(backgroundColor.isEmpty()){
-                            htmlString += line;
-                            htmlString += "<br>";
-                            continue;
-                        }
-                        
-                        htmlString += "<span style=\"background-color: "+backgroundColor+";\">"+line+"</span>";
-                        htmlString += "<br>";
                     }
-                    
-                    textview.setText(Html.fromHtml(htmlString.trim()));
                 }
             })
-            .setLoading(textview)
+            //.setLoading(textview)
             .run();
         return new AlertDialog.Builder(MainActivity.this)
             .setTitle(title)
