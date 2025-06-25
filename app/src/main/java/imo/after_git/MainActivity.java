@@ -504,8 +504,8 @@ public class MainActivity extends Activity
             String htmlString = "";
             
             if(fileState == 'M') htmlString = "<font color='#0C4EA2'>M</font> " + filePath;
-            if(fileState == '?') htmlString = "<font color='#0C4EA2'>+</font> " + filePath;
-            if(fileState == 'D') htmlString = "<font color='#0C4EA2'>-</font> " + filePath;
+            if(fileState == '?') htmlString = "<font color='#20883D'>+</font> " + filePath;
+            if(fileState == 'D') htmlString = "<font color='#FF0000'>-</font> " + filePath;
             if(htmlString.isEmpty()) htmlString = item;
 
             textview.setText(Html.fromHtml(htmlString));
