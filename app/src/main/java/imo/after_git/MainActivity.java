@@ -10,6 +10,9 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -19,14 +22,12 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import imo.after_run.CommandTermux;
 import java.util.Arrays;
-import android.widget.RelativeLayout;
-import java.io.PrintWriter;
-import java.io.OutputStream;
 
 public class MainActivity extends Activity 
 {
@@ -289,33 +290,7 @@ public class MainActivity extends Activity
                 @Override
                 public void run(){
                     String output = CommandTermux.getOutput();
-
-                    linesText.setText("");
-                    for (String line : output.trim().split("\n")) {
-                        String backgroundColor = null;
-
-                        if(line.startsWith("@@")) backgroundColor = "#DDF3FE";
-                        if(line.startsWith("+")) backgroundColor = "#DAFAE2";
-                        if(line.startsWith("-")) backgroundColor = "#FFEBEA";
-
-                        if(line.startsWith("+")) line = line.substring(1);
-                        if(line.startsWith("-")) line = line.substring(1);
-
-                        final TextView lineBackground = new TextView(MainActivity.this);
-                        lineBackground.setText(line);
-                        lineBackground.setTextSize(textSize);
-                        lineBackground.setTypeface(typeface);
-                        lineBackground.setLayoutParams(new ViewGroup.LayoutParams(
-                                                           ViewGroup.LayoutParams.MATCH_PARENT,
-                                                           ViewGroup.LayoutParams.WRAP_CONTENT
-                                                       ));
-                        if (backgroundColor != null)
-                            lineBackground.setBackgroundColor(Color.parseColor(backgroundColor));
-
-                        lineBackgroundsLayout.addView(lineBackground);
-
-                        linesText.append(line+"\n");
-                    }
+                    addColoredDiffBgToText(output, linesText, lineBackgroundsLayout);
                 }
             })
             .setLoading(linesText)
@@ -466,6 +441,55 @@ public class MainActivity extends Activity
         
         fixGitDialog = makeFixGitDialog(dialogTitle, dialogMessage, stringToCopy);
         fixGitDialog.show();
+    }
+    
+    void addColoredDiffBgToText(final String output, final TextView linesText, final LinearLayout backgroundLayout){
+        linesText.post(new Runnable() {
+                @Override
+                public void run() {
+                    linesText.setText("");
+                    backgroundLayout.removeAllViews();
+
+                    TextPaint textPaint = linesText.getPaint();
+                    int availableWidth = linesText.getWidth() - linesText.getPaddingLeft() - linesText.getPaddingRight();
+
+                    for (String line : output.trim().split("\n")) {
+                        String backgroundColor = null;
+                        
+                        if(line.startsWith("@@")) backgroundColor = "#DDF3FE";
+                        if(line.startsWith("+")) backgroundColor = "#DAFAE2";
+                        if(line.startsWith("-")) backgroundColor = "#FFEBEA";
+
+                        if(line.startsWith("+")) line = line.substring(1);
+                        if(line.startsWith("-")) line = line.substring(1);
+
+                        linesText.append(line + "\n");
+
+                        StaticLayout staticLayout = new StaticLayout(
+                            line,
+                            textPaint,
+                            availableWidth,
+                            Layout.Alignment.ALIGN_NORMAL,
+                            linesText.getLineSpacingMultiplier(),
+                            linesText.getLineSpacingExtra(),
+                            false);
+
+                        int blockHeight = staticLayout.getHeight();
+
+                        final View lineBackground = new View(MainActivity.this);
+
+                        lineBackground.setLayoutParams(new ViewGroup.LayoutParams(
+                                                           ViewGroup.LayoutParams.MATCH_PARENT,
+                                                           blockHeight
+                                                       ));
+
+                        if (backgroundColor != null)
+                            lineBackground.setBackgroundColor(Color.parseColor(backgroundColor));
+
+                        backgroundLayout.addView(lineBackground);
+                    }
+                }
+            });
     }
     
     
