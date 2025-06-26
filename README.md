@@ -1,13 +1,13 @@
 # AfterGit
 
-implementation of the [AfterRun](https://github.com/IMOitself/AfterRun) app
+**simplest git client that uses Termux's API**
 
-> [!TIP]
-> currently remaking this README.
+> [!NOTE]
+> [implementation of AfterRun](https://github.com/IMOitself/AfterRun)
 
 ## Download
 > [!WARNING]
-> This project is at its early stages and is prone to bugs
+> this project is on its early stages
 
 [![Download](https://img.shields.io/badge/compiled.apk-blue?style=for-the-badge)](https://github.com/IMOitself/AfterGit/blob/master/compiled.apk)
 
