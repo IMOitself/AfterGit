@@ -382,8 +382,20 @@ public class MainActivity extends Activity
         
         List<GitLog> gitLogs = new ArrayList<>();
         
+        String currGraphSymbol = "";
+        
         for(String gitLogString : gitLogOutput.split("\n")){
-            gitLogs.add(new GitLog(gitLogString));
+            GitLog gitLog = new GitLog(gitLogString);
+            
+            //combine graphs and prevent empty log
+            if(gitLog.commitHash.isEmpty()){
+                currGraphSymbol += gitLog.graphSymbols + "\n";
+                continue;
+            }
+            gitLog.graphSymbols = currGraphSymbol + gitLog.graphSymbols;
+            currGraphSymbol = "";
+            
+            gitLogs.add(gitLog);
         }
         
         historyList.setAdapter(new GitLogAdapter(MainActivity.this, gitLogs));
@@ -684,6 +696,12 @@ public class MainActivity extends Activity
                     getResources().getDisplayMetrics()
                 );
                 rowLayout.setPadding(paddingDp, paddingDp, paddingDp, paddingDp);
+                rowLayout.setMinimumHeight(
+                    (int) TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP,
+                        25, //dp
+                        getResources().getDisplayMetrics()
+                    ));
 
                 viewHolder.graphSymbolsText = new TextView(context);
                 viewHolder.graphSymbolsText.setTypeface(Typeface.MONOSPACE);
@@ -695,13 +713,7 @@ public class MainActivity extends Activity
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     1.0f);
                 viewHolder.commitMessageText.setLayoutParams(params);
-                int minimumHeightDp = (int) TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP,
-                    25, //dp
-                    getResources().getDisplayMetrics()
-                );
-                viewHolder.commitMessageText.setMinimumHeight(minimumHeightDp);
-
+                
                 rowLayout.addView(viewHolder.graphSymbolsText);
                 rowLayout.addView(viewHolder.commitMessageText);
 
