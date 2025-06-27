@@ -15,6 +15,7 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -27,7 +28,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import imo.after_run.CommandTermux;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends Activity 
 {
@@ -127,12 +130,9 @@ public class MainActivity extends Activity
                     final String savedTextString = outputTxt.getText().toString();
                     
                     String command = "cd " + repoPath;
-                    command += "\ngit log --oneline --graph --pretty=format:\"-%h (%s)\"";
-                    // machine readable format: 
-                    // git log --oneline --graph --pretty=format:"-%h (%s)"
-                    //
-                    // sample output for each log:
-                    // * -0ha45sh (commit message here)
+                    command += "\ngit log --oneline --graph --pretty=format:\"-%h-%s\"";
+                    // machine readable format for each log:
+                    // * -0ha45sh-commit message here
 
                     new CommandTermux(command, MainActivity.this)
                         .setOnEnd(new Runnable(){
@@ -140,7 +140,7 @@ public class MainActivity extends Activity
                             public void run(){
                                 String output = CommandTermux.getOutput();
                                 
-                                historyDialog = makeHistoryDialog(repoPath, output.split("\n"));
+                                historyDialog = makeHistoryDialog(repoPath, output);
                                 historyDialog.show();
                                 outputTxt.setText(savedTextString);
                             }
@@ -357,9 +357,16 @@ public class MainActivity extends Activity
             .create();
     }
     
-    AlertDialog makeHistoryDialog(String repoPath, String[] historyArray){
+    AlertDialog makeHistoryDialog(String repoPath, String gitLogOutput){
         ListView historyList = new ListView(this);
-        historyList.setAdapter(new ArrayAdapter(this, android.R.layout.simple_list_item_1, historyArray));
+        
+        List<GitLog> gitLogs = new ArrayList<>();
+        
+        for(String gitLogString : gitLogOutput.split("\n")){
+            gitLogs.add(new GitLog(gitLogString));
+        }
+        
+        historyList.setAdapter(new GitLogAdapter(MainActivity.this, gitLogs));
         
         return new AlertDialog.Builder(MainActivity.this)
             .setTitle("Log")
@@ -567,7 +574,7 @@ public class MainActivity extends Activity
     
     
     
-    public class CommitChangesAdapter extends ArrayAdapter<String> {
+    class CommitChangesAdapter extends ArrayAdapter<String> {
 
         String repoPath = "";
 
@@ -611,6 +618,75 @@ public class MainActivity extends Activity
                 });
 
             return textview;
+        }
+    }
+    
+    class GitLog {
+        String graphSymbols = "";
+        String commitHash = "";
+        String commitMessage = "";
+
+        GitLog(String gitLogString) {
+            String[] parts = gitLogString.split("-", 3);
+            if (parts.length > 0) this.graphSymbols = parts[0];
+            if (parts.length > 1) this.commitHash = parts[1].trim();
+            if (parts.length > 2) this.commitMessage = parts[2].trim();
+        }
+    }
+
+
+    class GitLogAdapter extends ArrayAdapter<GitLog> {
+
+        private class ViewHolder {
+            TextView graphSymbolsText;
+            TextView commitMessageText;
+        }
+
+        public GitLogAdapter(Context context, List<GitLog> gitLogs) {
+            super(context, 0, gitLogs);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                Context context = getContext();
+                ViewHolder viewHolder = new ViewHolder();
+
+                LinearLayout rowLayout = new LinearLayout(context);
+                rowLayout.setOrientation(LinearLayout.HORIZONTAL);
+                rowLayout.setLayoutParams(new AbsListView.LayoutParams(
+                                              AbsListView.LayoutParams.MATCH_PARENT,
+                                              AbsListView.LayoutParams.WRAP_CONTENT));
+
+                viewHolder.graphSymbolsText = new TextView(context);
+                viewHolder.graphSymbolsText.setTypeface(Typeface.MONOSPACE);
+                viewHolder.graphSymbolsText.setTextColor(Color.parseColor("#03A9F4"));
+
+                viewHolder.commitMessageText = new TextView(context);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    1.0f);
+                viewHolder.commitMessageText.setLayoutParams(params);
+
+                rowLayout.addView(viewHolder.graphSymbolsText);
+                rowLayout.addView(viewHolder.commitMessageText);
+
+                convertView = rowLayout;
+                convertView.setTag(viewHolder);
+            }
+
+            // at this point, convertView is guaranteed to be a valid view with a ViewHolder tag.
+            ViewHolder viewHolder = (ViewHolder) convertView.getTag();
+
+            GitLog gitLog = getItem(position);
+            
+            if(gitLog == null) return convertView;
+
+            viewHolder.graphSymbolsText.setText(gitLog.graphSymbols);
+            viewHolder.commitMessageText.setText(gitLog.commitMessage);
+
+            return convertView;
         }
     }
 }
