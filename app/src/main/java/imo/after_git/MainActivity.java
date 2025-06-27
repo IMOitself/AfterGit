@@ -15,6 +15,8 @@ import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextWatcher;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -672,20 +674,33 @@ public class MainActivity extends Activity
 
                 LinearLayout rowLayout = new LinearLayout(context);
                 rowLayout.setOrientation(LinearLayout.HORIZONTAL);
+                rowLayout.setGravity(Gravity.CENTER_VERTICAL);
                 rowLayout.setLayoutParams(new AbsListView.LayoutParams(
                                               AbsListView.LayoutParams.MATCH_PARENT,
                                               AbsListView.LayoutParams.WRAP_CONTENT));
+                int paddingDp = (int) TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
+                    8, //dp
+                    getResources().getDisplayMetrics()
+                );
+                rowLayout.setPadding(paddingDp, paddingDp, paddingDp, paddingDp);
 
                 viewHolder.graphSymbolsText = new TextView(context);
                 viewHolder.graphSymbolsText.setTypeface(Typeface.MONOSPACE);
                 viewHolder.graphSymbolsText.setTextColor(Color.parseColor("#03A9F4"));
-
+                
                 viewHolder.commitMessageText = new TextView(context);
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     1.0f);
                 viewHolder.commitMessageText.setLayoutParams(params);
+                int minimumHeightDp = (int) TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
+                    25, //dp
+                    getResources().getDisplayMetrics()
+                );
+                viewHolder.commitMessageText.setMinimumHeight(minimumHeightDp);
 
                 rowLayout.addView(viewHolder.graphSymbolsText);
                 rowLayout.addView(viewHolder.commitMessageText);
