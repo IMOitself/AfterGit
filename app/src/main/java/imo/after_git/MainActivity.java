@@ -191,8 +191,10 @@ public class MainActivity extends Activity
                 public void run(){
                     String output = CommandTermux.getOutput();
                     
-                    boolean isWorking = output.contains("On branch");
-                    if(! isWorking) fixGit(output, repoPath);
+                    if(! isGitWorking(output)){
+                        fixGit(output, repoPath);
+                        return;
+                    }
                     
                     if(! isRepository(output, outputTxt)) return;
                     
@@ -460,6 +462,11 @@ public class MainActivity extends Activity
             .quickSetOutputWithLoading(outputText)
             .setLoading(outputText)
             .run();
+    }
+    
+    boolean isGitWorking(final String output){
+        return ! output.contains("git: not found") || 
+               ! output.contains("dubious ownership");
     }
     
     void fixGit(final String output, String repoPath){
