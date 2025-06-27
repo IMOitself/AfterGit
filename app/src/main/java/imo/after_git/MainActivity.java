@@ -50,7 +50,7 @@ public class MainActivity extends Activity
     
     static class gitStatusShort {
         static String branchStatus = "";
-        static String[] filesStatus = {};
+        static String[] changedFiles = {};
     }
     
     @Override
@@ -105,7 +105,7 @@ public class MainActivity extends Activity
                     public void run(){
                         boolean doPull = gitStatusShort.branchStatus.contains("behind");
                         boolean doPush = gitStatusShort.branchStatus.contains("ahead");
-                        boolean doCommit = gitStatusShort.filesStatus.length != 0;
+                        boolean doCommit = gitStatusShort.changedFiles.length != 0;
                         
                         pullBtn.setVisibility(doPull ? View.VISIBLE : View.GONE);
                         pushBtn.setVisibility(doPush ? View.VISIBLE : View.GONE);
@@ -121,7 +121,7 @@ public class MainActivity extends Activity
         commitBtn.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v){
-                    commitDialog = makeCommitDialog(repoPath, gitStatusShort.filesStatus);
+                    commitDialog = makeCommitDialog(repoPath, gitStatusShort.changedFiles);
                     commitDialog.show();
                 }
             });
@@ -230,7 +230,7 @@ public class MainActivity extends Activity
                     
                     String[] statusShortParts = statusShort.trim().split("\n");
                     gitStatusShort.branchStatus = statusShortParts[0];
-                    gitStatusShort.filesStatus = Arrays.copyOfRange(statusShortParts, 1, statusShortParts.length);
+                    gitStatusShort.changedFiles = Arrays.copyOfRange(statusShortParts, 1, statusShortParts.length);
                     
                     outputTxt.setText(statusLong);
                     onEnd.run();
@@ -266,7 +266,7 @@ public class MainActivity extends Activity
     
     
     
-    AlertDialog makeCommitDialog(final String repoPath, String[] changes){
+    AlertDialog makeCommitDialog(final String repoPath, String[] changedFiles){
         String title = "Commit Changes";
         LinearLayout layout = new LinearLayout(this);
         ListView changesList = new ListView(this);
@@ -280,7 +280,7 @@ public class MainActivity extends Activity
         layout.addView(amendCheckbox);
         layout.addView(stageAllFilesCheckbox);
         
-        changesList.setAdapter(new CommitChangesAdapter(MainActivity.this, repoPath, changes));
+        changesList.setAdapter(new CommitChangesAdapter(MainActivity.this, repoPath, changedFiles));
         commitMessageEdit.setHint("commit message...");
         amendCheckbox.setText("Amend previous commit");
         stageAllFilesCheckbox.setText("Stage all files");
@@ -324,7 +324,7 @@ public class MainActivity extends Activity
         return commitDialog;
     }
     
-    AlertDialog makeDiffDialog(final String repoPath, final String filePath){
+    AlertDialog makeDiffDialog(final String repoPath, final String changedFile){
         String title = "Diff";
         ScrollView scrollView = new ScrollView(this);
         final RelativeLayout linesLayout = new RelativeLayout(this);
@@ -349,7 +349,7 @@ public class MainActivity extends Activity
         scrollView.addView(linesLayout);
         
         String command = "cd " + repoPath;
-        command += "\ngit diff HEAD -- " + filePath;
+        command += "\ngit diff HEAD -- " + changedFile;
         
         new CommandTermux(command, MainActivity.this)
             .setOnEnd(new Runnable(){
@@ -610,8 +610,8 @@ public class MainActivity extends Activity
 
         String repoPath = "";
 
-        public CommitChangesAdapter(Context context, String repoPath, String[] changes) {
-            super(context, 0, changes);
+        public CommitChangesAdapter(Context context, String repoPath, String[] changedFiles) {
+            super(context, 0, changedFiles);
             this.repoPath = repoPath;
         }
 
