@@ -677,6 +677,7 @@ public class MainActivity extends Activity
             
             if(fileState == 'M') htmlString = "<font color='#0C4EA2'>M</font> " + filePath;
             if(fileState == '?') htmlString = "<font color='#20883D'>+</font> " + filePath;
+            if(fileState == 'A') htmlString = "<font color='#20883D'>+</font> " + filePath;
             if(fileState == 'D') htmlString = "<font color='#FF0000'>-</font> " + filePath;
             if(htmlString.isEmpty()) htmlString = item;
 
@@ -739,12 +740,12 @@ public class MainActivity extends Activity
                 rowLayout.setMinimumHeight(
                     (int) TypedValue.applyDimension(
                         TypedValue.COMPLEX_UNIT_DIP,
-                        25, //dp
+                        50, //dp
                         getResources().getDisplayMetrics()
                     ));
 
                 viewHolder.graphSymbolsText = new TextView(context);
-                viewHolder.graphSymbolsText.setTypeface(Typeface.MONOSPACE);
+                viewHolder.graphSymbolsText.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
                 viewHolder.graphSymbolsText.setTextColor(Color.parseColor("#03A9F4"));
                 
                 viewHolder.commitMessageText = new TextView(context);
