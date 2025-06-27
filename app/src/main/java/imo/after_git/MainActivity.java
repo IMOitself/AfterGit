@@ -324,14 +324,22 @@ public class MainActivity extends Activity
         scrollView.addView(linesLayout);
         
         String command = "cd " + repoPath;
-        command += "\ngit diff HEAD -- " + filePath + " | sed -n '/^@@/,$p'";
+        command += "\ngit diff HEAD -- " + filePath;
         
         new CommandTermux(command, MainActivity.this)
             .setOnEnd(new Runnable(){
                 @Override
                 public void run(){
                     String output = CommandTermux.getOutput();
-                    addColoredDiffBgToText(output, linesText, lineBackgroundsLayout);
+                    
+                    String outputWithoutHeader = "";
+                    
+                    if(output.contains("@@"))
+                        outputWithoutHeader = output.substring(output.indexOf("@@"));
+                    else
+                        outputWithoutHeader = "Binaries differ";
+                    
+                    addColoredDiffBgToText(outputWithoutHeader, linesText, lineBackgroundsLayout);
                 }
             })
             .setLoading(linesText)
