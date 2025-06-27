@@ -139,7 +139,7 @@ public class MainActivity extends Activity
         historyBtn.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v){
-                    final String savedTextString = outputTxt.getText().toString();
+                    final String savedTextString = historyBtn.getText().toString();
                     
                     String command = "cd " + repoPath;
                     command += "\ngit log --oneline --graph --pretty=format:\"-%h-%s\"";
@@ -154,10 +154,10 @@ public class MainActivity extends Activity
                                 
                                 historyDialog = makeHistoryDialog(repoPath, output);
                                 historyDialog.show();
-                                outputTxt.setText(savedTextString);
+                                historyBtn.setText(savedTextString);
                             }
                         })
-                        .setLoading(outputTxt)
+                        .setLoading(historyBtn)
                         .run();
                 }
             });
