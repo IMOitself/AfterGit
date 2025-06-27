@@ -37,6 +37,7 @@ public class MainActivity extends Activity
     boolean canRefreshStatus = false;
     AlertDialog commitDialog;
     AlertDialog diffDialog;
+    AlertDialog historyDialog;
     AlertDialog configDialog;
     AlertDialog fixGitDialog;
     
@@ -59,10 +60,12 @@ public class MainActivity extends Activity
         final Button commitBtn = findViewById(R.id.commit_btn);
         final Button pullBtn = findViewById(R.id.pull_btn);
         final Button pushBtn = findViewById(R.id.push_btn);
+        final Button historyBtn = findViewById(R.id.history_btn);
 		final TextView outputTxt = findViewById(R.id.output_txt);
         commitBtn.setVisibility(View.GONE);
         pullBtn.setVisibility(View.GONE);
         pushBtn.setVisibility(View.GONE);
+        historyBtn.setVisibility(View.GONE);
         
 		statusBtn.setOnClickListener(new View.OnClickListener(){
 			@Override
@@ -70,6 +73,7 @@ public class MainActivity extends Activity
                 commitBtn.setVisibility(View.GONE);
                 pullBtn.setVisibility(View.GONE);
                 pushBtn.setVisibility(View.GONE);
+                historyBtn.setVisibility(View.GONE);
                 
 				repoPath = repoPathEdit.getText().toString().trim();
                 
@@ -83,6 +87,7 @@ public class MainActivity extends Activity
                         pullBtn.setVisibility(doPull ? View.VISIBLE : View.GONE);
                         pushBtn.setVisibility(doPush ? View.VISIBLE : View.GONE);
                         commitBtn.setVisibility(doCommit ? View.VISIBLE : View.GONE);
+                        historyBtn.setVisibility(View.VISIBLE);
                     }
                 };
                 
@@ -115,6 +120,30 @@ public class MainActivity extends Activity
                     
                 }
             });
+            
+        historyBtn.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    final String savedTextString = outputTxt.getText().toString();
+                    
+                    String command = "cd " + repoPath;
+                    command += "\ngit log --oneline --graph";
+
+                    new CommandTermux(command, MainActivity.this)
+                        .setOnEnd(new Runnable(){
+                            @Override
+                            public void run(){
+                                String output = CommandTermux.getOutput();
+                                
+                                historyDialog = makeHistoryDialog(repoPath, output.split("\n"));
+                                historyDialog.show();
+                                outputTxt.setText(savedTextString);
+                            }
+                        })
+                        .setLoading(outputTxt)
+                        .run();
+                }
+            });
     }
 
     @Override
@@ -139,6 +168,9 @@ public class MainActivity extends Activity
             
         if(fixGitDialog != null && fixGitDialog.isShowing())
             fixGitDialog.dismiss();
+            
+        if(historyDialog != null && historyDialog.isShowing())
+            historyDialog.dismiss();
     }
     
     
@@ -158,6 +190,7 @@ public class MainActivity extends Activity
                 @Override
                 public void run(){
                     String output = CommandTermux.getOutput();
+                    
                     boolean isWorking = output.contains("On branch");
                     if(! isWorking) fixGit(output, repoPath);
                     
@@ -303,6 +336,17 @@ public class MainActivity extends Activity
             .create();
     }
     
+    AlertDialog makeHistoryDialog(String repoPath, String[] historyArray){
+        ListView historyList = new ListView(this);
+        historyList.setAdapter(new ArrayAdapter(this, android.R.layout.simple_list_item_1, historyArray));
+        
+        return new AlertDialog.Builder(MainActivity.this)
+            .setTitle("Log")
+            .setView(historyList)
+            .setPositiveButton("Close", null)
+            .create();
+    }
+    
     AlertDialog makeConfigDialog(final String repoPath){
         String title = "Configure Repository";
         LinearLayout layout = new LinearLayout(this);
@@ -372,7 +416,6 @@ public class MainActivity extends Activity
             })
             .create();
     }
-    
     
     
     
