@@ -211,6 +211,12 @@ public class MainActivity extends Activity
                     onEnd.run();
                 }
             })
+            .setOnError(new Runnable(){
+                @Override
+                public void run(){
+                    outputTxt.setText("try again");
+                }
+            })
             .setLoading(outputTxt)
             .run();
     }
