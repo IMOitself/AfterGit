@@ -44,7 +44,7 @@ public class MainActivity extends Activity
     boolean canRefreshStatus = false;
     AlertDialog commitDialog;
     AlertDialog diffDialog;
-    AlertDialog historyDialog;
+    AlertDialog gitLogsDialog;
     AlertDialog configDialog;
     AlertDialog fixGitDialog;
     AlertDialog gitLogItemDescDialog;
@@ -68,12 +68,12 @@ public class MainActivity extends Activity
         final Button commitBtn = findViewById(R.id.commit_btn);
         final Button pullBtn = findViewById(R.id.pull_btn);
         final Button pushBtn = findViewById(R.id.push_btn);
-        final Button historyBtn = findViewById(R.id.history_btn);
+        final Button gitLogBtn = findViewById(R.id.history_btn);
 		final TextView outputTxt = findViewById(R.id.output_txt);
         commitBtn.setVisibility(View.GONE);
         pullBtn.setVisibility(View.GONE);
         pushBtn.setVisibility(View.GONE);
-        historyBtn.setEnabled(false);
+        gitLogBtn.setEnabled(false);
         
         repoPathEdit.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -86,7 +86,7 @@ public class MainActivity extends Activity
                     commitBtn.setVisibility(View.GONE);
                     pullBtn.setVisibility(View.GONE);
                     pushBtn.setVisibility(View.GONE);
-                    historyBtn.setEnabled(false);
+                    gitLogBtn.setEnabled(false);
                 }
             });
         
@@ -97,7 +97,7 @@ public class MainActivity extends Activity
                 commitBtn.setVisibility(View.GONE);
                 pullBtn.setVisibility(View.GONE);
                 pushBtn.setVisibility(View.GONE);
-                historyBtn.setEnabled(false);
+                gitLogBtn.setEnabled(false);
                 
 				repoPath = repoPathEdit.getText().toString().trim();
                 
@@ -111,7 +111,7 @@ public class MainActivity extends Activity
                         pullBtn.setVisibility(doPull ? View.VISIBLE : View.GONE);
                         pushBtn.setVisibility(doPush ? View.VISIBLE : View.GONE);
                         commitBtn.setVisibility(doCommit ? View.VISIBLE : View.GONE);
-                        historyBtn.setEnabled(true);
+                        gitLogBtn.setEnabled(true);
                     }
                 };
                 
@@ -145,10 +145,10 @@ public class MainActivity extends Activity
                 }
             });
             
-        historyBtn.setOnClickListener(new View.OnClickListener(){
+        gitLogBtn.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v){
-                    final String savedTextString = historyBtn.getText().toString();
+                    final String savedTextString = gitLogBtn.getText().toString();
                     
                     String command = "cd " + repoPath;
                     command += "\ngit log --oneline --graph --pretty=format:\"-%h-%s\"";
@@ -161,12 +161,12 @@ public class MainActivity extends Activity
                             public void run(){
                                 String output = CommandTermux.getOutput();
                                 
-                                historyDialog = makeHistoryDialog(repoPath, output);
-                                historyDialog.show();
-                                historyBtn.setText(savedTextString);
+                                gitLogsDialog = makeGitLogsDialog(repoPath, output);
+                                gitLogsDialog.show();
+                                gitLogBtn.setText(savedTextString);
                             }
                         })
-                        .setLoading(historyBtn)
+                        .setLoading(gitLogBtn)
                         .run();
                 }
             });
@@ -195,8 +195,8 @@ public class MainActivity extends Activity
         if(fixGitDialog != null && fixGitDialog.isShowing())
             fixGitDialog.dismiss();
             
-        if(historyDialog != null && historyDialog.isShowing())
-            historyDialog.dismiss();
+        if(gitLogsDialog != null && gitLogsDialog.isShowing())
+            gitLogsDialog.dismiss();
             
         if(gitLogItemDescDialog != null && gitLogItemDescDialog.isShowing())
             gitLogItemDescDialog.dismiss();
@@ -383,8 +383,8 @@ public class MainActivity extends Activity
             .create();
     }
     
-    AlertDialog makeHistoryDialog(String repoPath, String gitLogOutput){
-        ListView historyList = new ListView(this);
+    AlertDialog makeGitLogsDialog(String repoPath, String gitLogOutput){
+        ListView gitLogsList = new ListView(this);
         
         List<GitLog> gitLogs = new ArrayList<>();
         
@@ -404,11 +404,11 @@ public class MainActivity extends Activity
             gitLogs.add(gitLog);
         }
         
-        historyList.setAdapter(new GitLogAdapter(MainActivity.this, gitLogs));
+        gitLogsList.setAdapter(new GitLogAdapter(MainActivity.this, gitLogs));
         
         return new AlertDialog.Builder(MainActivity.this)
             .setTitle("Log")
-            .setView(historyList)
+            .setView(gitLogsList)
             .setPositiveButton("Close", null)
             .create();
     }
