@@ -416,14 +416,18 @@ public class MainActivity extends Activity
     AlertDialog makeGitLogItemDescDialog(final String repoPath, final GitLog gitLog){
         String title = "Commit";
         LinearLayout layout = new LinearLayout(this);
-        final TextView loadingText = new TextView(this);
+        final TextView textview = new TextView(this);
         final ListView changesList = new ListView(this);
         
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.addView(loadingText);
+        layout.addView(textview);
         layout.addView(changesList);
         
+        final String commandDivider = "COMMIT DESC ABOVE. CHANGED FILES BELOW.";
+        
         String command = "cd " + repoPath;
+        command += "\ngit show -s --pretty=format:\"commit hash: %h%nauthor: %an%ndate: %cd%n- %cr\" "+gitLog.commitHash;
+        command += "\necho \""+ commandDivider+"\"";
         command += "\ngit diff-tree --no-commit-id --name-status -r "+gitLog.commitHash;
         
         new CommandTermux(command, MainActivity.this)
@@ -431,15 +435,19 @@ public class MainActivity extends Activity
                 @Override
                 public void run(){
                     String output = CommandTermux.getOutput();
-                    String[] changedFiles = output.trim().split("\n");
+                    
+                    String[] outputParts = output.split(commandDivider);
+                    
+                    String commitDesc = outputParts[0];
+                    String[] changedFiles = outputParts[1].trim().split("\n");
                     
                     changesList.setAdapter(new CommitChangesAdapter(MainActivity.this, repoPath, changedFiles, gitLog.commitHash));
                     changesList.invalidate();
                     
-                    loadingText.setVisibility(View.GONE);
+                    textview.setText(commitDesc);
                 }
             })
-            .setLoading(loadingText)
+            .setLoading(textview)
             .run();
             
         return new AlertDialog.Builder(MainActivity.this)
