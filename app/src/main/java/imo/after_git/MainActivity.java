@@ -90,6 +90,12 @@ public class MainActivity extends Activity
 		statusBtn.setOnClickListener(new View.OnClickListener(){
 			@Override
 			public void onClick(View v){
+                outputTxt.setText("");
+                commitBtn.setVisibility(View.GONE);
+                pullBtn.setVisibility(View.GONE);
+                pushBtn.setVisibility(View.GONE);
+                historyBtn.setEnabled(false);
+                
 				repoPath = repoPathEdit.getText().toString().trim();
                 
                 Runnable onEnd = new Runnable(){
