@@ -284,7 +284,7 @@ public class MainActivity extends Activity
         layout.addView(amendCheckbox);
         layout.addView(stageAllFilesCheckbox);
         
-        changesList.setAdapter(new CommitChangesAdapter(MainActivity.this, repoPath, changedFiles));
+        changesList.setAdapter(new CommitChangesAdapter(MainActivity.this, repoPath, changedFiles, null));
         commitMessageEdit.setHint("commit message...");
         amendCheckbox.setText("Amend previous commit");
         stageAllFilesCheckbox.setText("Stage all files");
@@ -328,7 +328,7 @@ public class MainActivity extends Activity
         return commitDialog;
     }
     
-    AlertDialog makeDiffDialog(final String repoPath, final String changedFile){
+    AlertDialog makeDiffDialog(final String repoPath, final String changedFile, String commitHash){
         String title = "Diff";
         ScrollView scrollView = new ScrollView(this);
         final RelativeLayout linesLayout = new RelativeLayout(this);
@@ -352,8 +352,10 @@ public class MainActivity extends Activity
         linesLayout.addView(linesText);
         scrollView.addView(linesLayout);
         
+        if(commitHash == null) commitHash = "HEAD";
+        
         String command = "cd " + repoPath;
-        command += "\ngit diff HEAD -- " + changedFile;
+        command += "\ngit diff "+commitHash+" -- " + changedFile;
         
         new CommandTermux(command, MainActivity.this)
             .setOnEnd(new Runnable(){
@@ -411,7 +413,7 @@ public class MainActivity extends Activity
             .create();
     }
     
-    AlertDialog makeGitLogItemDescDialog(final String repoPath, GitLog gitLog){
+    AlertDialog makeGitLogItemDescDialog(final String repoPath, final GitLog gitLog){
         String title = "Commit";
         LinearLayout layout = new LinearLayout(this);
         final TextView loadingText = new TextView(this);
@@ -431,7 +433,7 @@ public class MainActivity extends Activity
                     String output = CommandTermux.getOutput();
                     String[] changedFiles = output.trim().split("\n");
                     
-                    changesList.setAdapter(new CommitChangesAdapter(MainActivity.this, repoPath, changedFiles));
+                    changesList.setAdapter(new CommitChangesAdapter(MainActivity.this, repoPath, changedFiles, gitLog.commitHash));
                     changesList.invalidate();
                     
                     loadingText.setVisibility(View.GONE);
@@ -649,10 +651,12 @@ public class MainActivity extends Activity
     class CommitChangesAdapter extends ArrayAdapter<String> {
 
         String repoPath = "";
+        String commitHash;
 
-        public CommitChangesAdapter(Context context, String repoPath, String[] changedFiles) {
+        public CommitChangesAdapter(Context context, String repoPath, String[] changedFiles, String commitHash) {
             super(context, 0, changedFiles);
             this.repoPath = repoPath;
+            this.commitHash = commitHash;
         }
 
         @Override
@@ -685,7 +689,7 @@ public class MainActivity extends Activity
             textview.setOnClickListener(new View.OnClickListener(){
                     @Override
                     public void onClick(View v){
-                        diffDialog = makeDiffDialog(repoPath, filePath);
+                        diffDialog = makeDiffDialog(repoPath, filePath, commitHash);
                         diffDialog.show();
                     }
                 });
