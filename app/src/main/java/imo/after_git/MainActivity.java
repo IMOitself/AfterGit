@@ -127,7 +127,12 @@ public class MainActivity extends Activity
                     final String savedTextString = outputTxt.getText().toString();
                     
                     String command = "cd " + repoPath;
-                    command += "\ngit log --oneline --graph";
+                    command += "\ngit log --oneline --graph --pretty=format:\"-%h (%s)\"";
+                    // machine readable format: 
+                    // git log --oneline --graph --pretty=format:"-%h (%s)"
+                    //
+                    // sample output for each log:
+                    // * -0ha45sh (commit message here)
 
                     new CommandTermux(command, MainActivity.this)
                         .setOnEnd(new Runnable(){
