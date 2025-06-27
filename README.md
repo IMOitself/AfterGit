@@ -31,10 +31,11 @@
 - [x] commit changes
 - [x] commit amend
 - [x] show changes' diff
+- [x] commit history
+- [x] commit history graph
+- [ ] commit diff
 - [ ] push
 - [ ] pull
-- [ ] commit history
-- [ ] commit history graph
 
 <br>
 
