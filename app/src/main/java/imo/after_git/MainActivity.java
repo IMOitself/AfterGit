@@ -47,6 +47,7 @@ public class MainActivity extends Activity
     AlertDialog historyDialog;
     AlertDialog configDialog;
     AlertDialog fixGitDialog;
+    AlertDialog gitLogItemDescDialog;
     
     static class gitStatusShort {
         static String branchStatus = "";
@@ -196,6 +197,9 @@ public class MainActivity extends Activity
             
         if(historyDialog != null && historyDialog.isShowing())
             historyDialog.dismiss();
+            
+        if(gitLogItemDescDialog != null && gitLogItemDescDialog.isShowing())
+            gitLogItemDescDialog.dismiss();
     }
     
     
@@ -403,6 +407,42 @@ public class MainActivity extends Activity
         return new AlertDialog.Builder(MainActivity.this)
             .setTitle("Log")
             .setView(historyList)
+            .setPositiveButton("Close", null)
+            .create();
+    }
+    
+    AlertDialog makeGitLogItemDescDialog(final String repoPath, GitLog gitLog){
+        String title = "Commit";
+        LinearLayout layout = new LinearLayout(this);
+        final TextView loadingText = new TextView(this);
+        final ListView changesList = new ListView(this);
+        
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.addView(loadingText);
+        layout.addView(changesList);
+        
+        String command = "cd " + repoPath;
+        command += "\ngit diff-tree --no-commit-id --name-status -r "+gitLog.commitHash;
+        
+        new CommandTermux(command, MainActivity.this)
+            .setOnEnd(new Runnable(){
+                @Override
+                public void run(){
+                    String output = CommandTermux.getOutput();
+                    String[] changedFiles = output.trim().split("\n");
+                    
+                    changesList.setAdapter(new CommitChangesAdapter(MainActivity.this, repoPath, changedFiles));
+                    changesList.invalidate();
+                    
+                    loadingText.setVisibility(View.GONE);
+                }
+            })
+            .setLoading(loadingText)
+            .run();
+            
+        return new AlertDialog.Builder(MainActivity.this)
+            .setTitle(title)
+            .setView(layout)
             .setPositiveButton("Close", null)
             .create();
     }
@@ -631,7 +671,7 @@ public class MainActivity extends Activity
 
             String fileStateString = item.substring(0, 2).trim();
             final char fileState = fileStateString.charAt(0);
-            final String filePath = item.substring(2);
+            final String filePath = item.substring(2).trim();
 
             String htmlString = "";
             
@@ -724,12 +764,19 @@ public class MainActivity extends Activity
             // at this point, convertView is guaranteed to be a valid view with a ViewHolder tag.
             ViewHolder viewHolder = (ViewHolder) convertView.getTag();
 
-            GitLog gitLog = getItem(position);
+            final GitLog gitLog = getItem(position);
             
             if(gitLog == null) return convertView;
 
             viewHolder.graphSymbolsText.setText(gitLog.graphSymbols);
             viewHolder.commitMessageText.setText(gitLog.commitMessage);
+            convertView.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v){
+                        gitLogItemDescDialog = makeGitLogItemDescDialog(repoPath, gitLog);
+                        gitLogItemDescDialog.show();
+                    }
+                });
 
             return convertView;
         }
