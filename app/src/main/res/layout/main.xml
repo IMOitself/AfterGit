@@ -27,18 +27,17 @@
 			android:id="@+id/status_btn"/>
 
 	</LinearLayout>
-    
-    <Button
-        android:layout_width="match_parent"
-        style="?android:attr/buttonBarButtonStyle"
-        android:layout_height="wrap_content"
-        android:text="History"
+
+	<Button
+		android:layout_width="match_parent"
+		style="?android:attr/buttonBarButtonStyle"
+		android:layout_height="wrap_content"
+		android:text="History"
 		android:id="@+id/history_btn"/>
-    
+
 	<TextView
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:text="Output:"
 		android:id="@+id/output_txt"
 		android:textIsSelectable="true"/>
 

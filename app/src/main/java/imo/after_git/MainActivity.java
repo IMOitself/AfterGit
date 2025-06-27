@@ -9,10 +9,12 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.Html;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -68,16 +70,26 @@ public class MainActivity extends Activity
         commitBtn.setVisibility(View.GONE);
         pullBtn.setVisibility(View.GONE);
         pushBtn.setVisibility(View.GONE);
-        historyBtn.setVisibility(View.GONE);
+        historyBtn.setEnabled(false);
+        
+        repoPathEdit.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    outputTxt.setText("");
+                    commitBtn.setVisibility(View.GONE);
+                    pullBtn.setVisibility(View.GONE);
+                    pushBtn.setVisibility(View.GONE);
+                    historyBtn.setEnabled(false);
+                }
+            });
         
 		statusBtn.setOnClickListener(new View.OnClickListener(){
 			@Override
 			public void onClick(View v){
-                commitBtn.setVisibility(View.GONE);
-                pullBtn.setVisibility(View.GONE);
-                pushBtn.setVisibility(View.GONE);
-                historyBtn.setVisibility(View.GONE);
-                
 				repoPath = repoPathEdit.getText().toString().trim();
                 
                 Runnable onEnd = new Runnable(){
@@ -90,7 +102,7 @@ public class MainActivity extends Activity
                         pullBtn.setVisibility(doPull ? View.VISIBLE : View.GONE);
                         pushBtn.setVisibility(doPush ? View.VISIBLE : View.GONE);
                         commitBtn.setVisibility(doCommit ? View.VISIBLE : View.GONE);
-                        historyBtn.setVisibility(View.VISIBLE);
+                        historyBtn.setEnabled(true);
                     }
                 };
                 
