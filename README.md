@@ -27,14 +27,15 @@
 ## Features
 
 - [x] check repo status
-- [x] see changes
+- [x] list unsaved changes
 - [x] commit changes
 - [x] commit amend
-- [x] show changes' diff
+- [x] show unsaved changes' diff
 - [x] commit history
 - [x] commit history graph
 - [ ] commit diff
 - [ ] push
+- [ ] fetch
 - [ ] pull
 
 <br>
