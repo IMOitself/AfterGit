@@ -6,8 +6,10 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
@@ -130,18 +132,16 @@ public class MainActivity extends Activity
         pullBtn.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v){
-                    //TODO: run git pull only if repo has commits behind
-                    if(repoPath.isEmpty()) return;
-                    
+                    //TODO: run git pull
+                    makeComingSoonDialog().show();
                 }
             });
             
         pushBtn.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v){
-                    //TODO: run git push only if repo has commits ahead
-                    if(repoPath.isEmpty()) return;
-                    
+                    //TODO: run git push
+                    makeComingSoonDialog().show();
                 }
             });
             
@@ -540,6 +540,21 @@ public class MainActivity extends Activity
                     } catch(Exception e) {}
                 }
             })
+            .create();
+    }
+    
+    AlertDialog makeComingSoonDialog(){
+        return new AlertDialog.Builder(MainActivity.this)
+            .setTitle("Coming Soon")
+            .setMessage("will add this feature in the future :D")
+            .setNeutralButton("Look For Updates", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dia, int which) {
+                    String url = "https://github.com/IMOitself/AfterGit";
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                }
+            })
+            .setPositiveButton("Ok", null)
             .create();
     }
     
