@@ -44,3 +44,12 @@
 
 > [!TIP]
 > currently adding screenshots :D
+
+![ss1](assets/ss1_home.jpg)
+![ss2](assets/ss2_commit.jpg)
+![ss3](assets/ss3_diff.jpg)
+![ss4](assets/ss4_logs.jpg)
+![ss5](assets/ss5_logs.jpg)
+![ss6](assets/ss6_commit_desc.jpg)
+![ss7](assets/ss7_status.jpg)
+![ss8](assets/ss8_coming_soon.jpg)
