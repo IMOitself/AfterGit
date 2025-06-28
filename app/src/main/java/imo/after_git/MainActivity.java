@@ -279,10 +279,10 @@ public class MainActivity extends Activity
         CheckBox stageAllFilesCheckbox = new CheckBox(this);
         
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.addView(changesList);
         layout.addView(commitMessageEdit);
         layout.addView(amendCheckbox);
         layout.addView(stageAllFilesCheckbox);
+        layout.addView(changesList);
         
         changesList.setAdapter(new CommitChangesAdapter(MainActivity.this, repoPath, changedFiles));
         commitMessageEdit.setHint("commit message...");
@@ -290,7 +290,6 @@ public class MainActivity extends Activity
         stageAllFilesCheckbox.setText("Stage all files");
         stageAllFilesCheckbox.setChecked(true);
         stageAllFilesCheckbox.setEnabled(false);// cannot be change
-        
         
         final AlertDialog commitDialog = new AlertDialog.Builder(MainActivity.this)
             .setTitle(title)
