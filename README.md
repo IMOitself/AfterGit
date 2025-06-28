@@ -31,7 +31,7 @@
 - [x] show unsaved changes' diff
 - [x] commit history
 - [x] commit history graph
-- [ ] commit diff
+- [x] commit diff
 - [ ] push
 - [ ] fetch
 - [ ] pull
