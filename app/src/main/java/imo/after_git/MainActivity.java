@@ -415,9 +415,8 @@ public class MainActivity extends Activity
     
     AlertDialog makeGitLogItemDescDialog(final String repoPath, final GitLog gitLog){
         String title = "Commit";
-        LinearLayout layout = new LinearLayout(this);
+        final LinearLayout layout = new LinearLayout(this);
         final TextView textview = new TextView(this);
-        final ListView changesList = new ListView(this);
         
         int paddingDp = (int) TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
@@ -427,7 +426,6 @@ public class MainActivity extends Activity
         layout.setPadding(paddingDp, paddingDp, paddingDp, paddingDp);
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.addView(textview);
-        layout.addView(changesList);
         
         final String commandDivider = "COMMIT DESC ABOVE. CHANGED FILES BELOW.";
         
@@ -445,12 +443,17 @@ public class MainActivity extends Activity
                     String[] outputParts = output.split(commandDivider);
                     
                     String commitDesc = outputParts[0];
+                    textview.setText(commitDesc);
+                    
+                    if (outputParts.length < 2) return;
+                    
                     String[] changedFiles = outputParts[1].trim().split("\n");
+                    
+                    final ListView changesList = new ListView(MainActivity.this);
+                    layout.addView(changesList);
                     
                     changesList.setAdapter(new CommitChangesAdapter(MainActivity.this, repoPath, changedFiles, gitLog.commitHash));
                     changesList.invalidate();
-                    
-                    textview.setText(commitDesc);
                 }
             })
             .setLoading(textview)
