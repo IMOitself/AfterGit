@@ -41,9 +41,6 @@
 <br>
 
 ## Screenshots
-<details>
-  <summary>take a look</summary>
 
-  coming soon..
-  
-</details>
+> [!TIP]
+> currently adding screenshots :D
