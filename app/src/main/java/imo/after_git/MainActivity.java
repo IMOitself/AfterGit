@@ -284,7 +284,7 @@ public class MainActivity extends Activity
         layout.addView(amendCheckbox);
         layout.addView(stageAllFilesCheckbox);
         
-        changesList.setAdapter(new CommitChangesAdapter(MainActivity.this, repoPath, changedFiles, null));
+        changesList.setAdapter(new CommitChangesAdapter(MainActivity.this, repoPath, changedFiles));
         commitMessageEdit.setHint("commit message...");
         amendCheckbox.setText("Amend previous commit");
         stageAllFilesCheckbox.setText("Stage all files");
@@ -328,6 +328,10 @@ public class MainActivity extends Activity
         return commitDialog;
     }
     
+    AlertDialog makeDiffDialog(final String repoPath, final String changedFile){
+        return makeDiffDialog(repoPath, changedFile, null);
+    }
+    
     AlertDialog makeDiffDialog(final String repoPath, final String changedFile, String commitHash){
         String title = "Diff";
         ScrollView scrollView = new ScrollView(this);
@@ -352,10 +356,13 @@ public class MainActivity extends Activity
         linesLayout.addView(linesText);
         scrollView.addView(linesLayout);
         
-        if(commitHash == null) commitHash = "HEAD";
+        boolean viewUnsavedChangesMode = commitHash == null;
         
         String command = "cd " + repoPath;
-        command += "\ngit diff "+commitHash+"^ "+commitHash+" -- " + changedFile;
+        
+        command += viewUnsavedChangesMode ? 
+            "\ngit diff HEAD -- " + changedFile :
+            "\ngit diff "+commitHash+"^ "+commitHash+" -- " + changedFile;
         
         new CommandTermux(command, MainActivity.this)
             .setOnEnd(new Runnable(){
@@ -669,11 +676,19 @@ public class MainActivity extends Activity
 
         String repoPath = "";
         String commitHash;
+        boolean viewUnsavedChangesMode = true;
 
         public CommitChangesAdapter(Context context, String repoPath, String[] changedFiles, String commitHash) {
             super(context, 0, changedFiles);
             this.repoPath = repoPath;
             this.commitHash = commitHash;
+            this.viewUnsavedChangesMode = false;
+        }
+        
+        public CommitChangesAdapter(Context context, String repoPath, String[] changedFiles) {
+            super(context, 0, changedFiles);
+            this.repoPath = repoPath;
+            this.viewUnsavedChangesMode = true;
         }
 
         @Override
@@ -706,7 +721,10 @@ public class MainActivity extends Activity
             textview.setOnClickListener(new View.OnClickListener(){
                     @Override
                     public void onClick(View v){
-                        diffDialog = makeDiffDialog(repoPath, filePath, commitHash);
+                        diffDialog = viewUnsavedChangesMode ?
+                            makeDiffDialog(repoPath, filePath) : 
+                            makeDiffDialog(repoPath, filePath, commitHash);
+                        
                         diffDialog.show();
                     }
                 });
