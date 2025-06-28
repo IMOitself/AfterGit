@@ -35,12 +35,6 @@
 		android:text="History"
 		android:id="@+id/history_btn"/>
 
-	<TextView
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:id="@+id/output_txt"
-		android:textIsSelectable="true"/>
-
 	<LinearLayout
 		android:orientation="horizontal"
 		android:layout_width="match_parent"
@@ -72,6 +66,18 @@
 			android:layout_weight="1.0"/>
 
 	</LinearLayout>
+
+	<ScrollView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:id="@+id/output_txt"
+			android:textIsSelectable="true"/>
+
+	</ScrollView>
 
 </LinearLayout>
 
