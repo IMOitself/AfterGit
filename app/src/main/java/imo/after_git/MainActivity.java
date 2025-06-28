@@ -124,7 +124,19 @@ public class MainActivity extends Activity
         commitBtn.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v){
-                    commitDialog = makeCommitDialog(repoPath, gitStatusShort.changedFiles);
+                    
+                    Runnable onAfterCommit = new Runnable(){
+                        @Override
+                        public void run(){
+                            outputTxt.setText("");
+                            commitBtn.setVisibility(View.GONE);
+                            pullBtn.setVisibility(View.GONE);
+                            pushBtn.setVisibility(View.GONE);
+                            gitLogBtn.setEnabled(false);
+                        }
+                    };
+                    
+                    commitDialog = makeCommitDialog(repoPath, gitStatusShort.changedFiles, onAfterCommit);
                     commitDialog.show();
                 }
             });
@@ -270,7 +282,7 @@ public class MainActivity extends Activity
     
     
     
-    AlertDialog makeCommitDialog(final String repoPath, String[] changedFiles){
+    AlertDialog makeCommitDialog(final String repoPath, String[] changedFiles, final Runnable onAfterCommit){
         String title = "Commit Changes";
         LinearLayout layout = new LinearLayout(this);
         ListView changesList = new ListView(this);
@@ -319,7 +331,10 @@ public class MainActivity extends Activity
                         @Override
                         public void onClick(View v){
                             String commitMessage = commitMessageEdit.getText().toString();
+                            
                             commit(commitMessage, amendCheckbox.isChecked());
+                            
+                            onAfterCommit.run();
                         }
                     });
             }
