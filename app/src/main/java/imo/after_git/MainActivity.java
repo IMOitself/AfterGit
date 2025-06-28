@@ -355,7 +355,7 @@ public class MainActivity extends Activity
         if(commitHash == null) commitHash = "HEAD";
         
         String command = "cd " + repoPath;
-        command += "\ngit diff "+commitHash+" -- " + changedFile;
+        command += "\ngit diff "+commitHash+"^ "+commitHash+" -- " + changedFile;
         
         new CommandTermux(command, MainActivity.this)
             .setOnEnd(new Runnable(){
