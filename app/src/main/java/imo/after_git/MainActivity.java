@@ -419,6 +419,12 @@ public class MainActivity extends Activity
         final TextView textview = new TextView(this);
         final ListView changesList = new ListView(this);
         
+        int paddingDp = (int) TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            8, //dp
+            getResources().getDisplayMetrics()
+        );
+        layout.setPadding(paddingDp, paddingDp, paddingDp, paddingDp);
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.addView(textview);
         layout.addView(changesList);
@@ -426,7 +432,7 @@ public class MainActivity extends Activity
         final String commandDivider = "COMMIT DESC ABOVE. CHANGED FILES BELOW.";
         
         String command = "cd " + repoPath;
-        command += "\ngit show -s --pretty=format:\"commit hash: %h%nauthor: %an%ndate: %cd%n- %cr\" "+gitLog.commitHash;
+        command += "\ngit show -s --pretty=format:\"%B%n%ncommit hash: %h%nauthor: %an%ndate: %cd%n- %cr\" "+gitLog.commitHash;
         command += "\necho \""+ commandDivider+"\"";
         command += "\ngit diff-tree --no-commit-id --name-status -r "+gitLog.commitHash;
         
