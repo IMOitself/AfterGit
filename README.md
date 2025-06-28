@@ -6,8 +6,6 @@
 > [implementation of AfterRun](https://github.com/IMOitself/AfterRun)
 
 ## Download
-> [!WARNING]
-> this project is on its early stages
 
 [![Download](https://img.shields.io/badge/compiled.apk-blue?style=for-the-badge)](https://github.com/IMOitself/AfterGit/blob/master/compiled.apk)
 
@@ -43,7 +41,7 @@
 ## Screenshots
 
 > [!TIP]
-> currently adding screenshots :D
+> idk i just like the green alert thingy here :D
 
 ![ss1](assets/ss1_home.jpg)
 ![ss2](assets/ss2_commit.jpg)
