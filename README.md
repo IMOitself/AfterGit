@@ -7,7 +7,7 @@
 
 ## Download
 
-[![Download](https://img.shields.io/badge/compiled.apk-blue?style=for-the-badge)](https://github.com/IMOitself/AfterGit/blob/master/compiled.apk)
+[![Releases](https://img.shields.io/badge/Releases-blue?style=for-the-badge)](https://github.com/IMOitself/AfterGit/releases/)
 
 <br>
 
