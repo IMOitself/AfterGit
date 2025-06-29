@@ -2,11 +2,10 @@
 
 **simplest git client that uses Termux's API**
 
-> [!TIP]
-> [implementation of AfterRun](https://github.com/IMOitself/AfterRun)
+[implementation of AfterRun](https://github.com/IMOitself/AfterRun)
 
-> [!NOTE]
-> this is the AIDE version of [AfterGit](/storage/emulated/0/AppProjects/AfterGit-Official) which is a Gradle project.
+> [!WARNING]
+>  building this project only works in AIDE. See [AfterGit-Official](/storage/emulated/0/AppProjects/AfterGit-Official) for a Gradle version.
 
 
 ## Download
