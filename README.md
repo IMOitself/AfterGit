@@ -4,9 +4,10 @@
 
 [an implementation of AfterRun](https://github.com/IMOitself/AfterRun)
 
-> [!WARNING]
->  building this project only works in AIDE. See [AfterGit-Official](https://github.com/IMOitself/AfterGit-Official) for a Gradle version.
+> [!NOTE]
+>  this version can only be build using AIDE. See [AfterGit-Official](https://github.com/IMOitself/AfterGit-Official) for Android Studio version.
 
+<br>
 
 ## Download
 
