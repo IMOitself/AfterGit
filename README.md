@@ -2,10 +2,10 @@
 
 **simplest git client that uses Termux's API**
 
-[implementation of AfterRun](https://github.com/IMOitself/AfterRun)
+[an implementation of AfterRun](https://github.com/IMOitself/AfterRun)
 
 > [!WARNING]
->  building this project only works in AIDE. See [AfterGit-Official](/storage/emulated/0/AppProjects/AfterGit-Official) for a Gradle version.
+>  building this project only works in AIDE. See [AfterGit-Official](https://github.com/IMOitself/AfterGit-Official) for a Gradle version.
 
 
 ## Download
@@ -46,11 +46,10 @@
 > [!TIP]
 > idk i just like the green alert thingy here :D
 
-![ss1](assets/ss1_home.jpg)
-![ss2](assets/ss2_commit.jpg)
-![ss3](assets/ss3_diff.jpg)
-![ss4](assets/ss4_logs.jpg)
-![ss5](assets/ss5_logs.jpg)
-![ss6](assets/ss6_commit_desc.jpg)
-![ss7](assets/ss7_status.jpg)
-![ss8](assets/ss8_coming_soon.jpg)
+<img src="assets/ss1_home.jpg" width="200"><img src="assets/ss2_commit.jpg" width="200">
+<img src="assets/ss3_diff.jpg" width="200">
+<img src="assets/ss4_logs.jpg" width="200">
+<img src="assets/ss5_logs.jpg" width="200">
+<img src="assets/ss6_commit_desc.jpg" width="200">
+<img src="assets/ss7_status.jpg" width="200">
+<img src="assets/ss8_coming_soon.jpg" width="200">
