@@ -1,6 +1,6 @@
 # AfterGit
 
-**simplest git client that uses Termux's API**. <br>
+**simplest git client for android that uses Termux's API**. <br>
 > an implementation of AfterRun<sup>[link](https://github.com/IMOitself/AfterRun)
 
 <br>
