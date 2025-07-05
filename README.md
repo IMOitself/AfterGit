@@ -9,7 +9,7 @@
 >  this version is for AIDE. See [AfterGit-Official](https://github.com/IMOitself/AfterGit-Official) for Android Studio version.
 
 > [!WARNING]
->  the development of this project has been stopped and will return after implementing a [solution](https://github.com/IMOitself/subfoldersync-vibe) to sync commits with [AfterGit-Official](https://github.com/IMOitself/AfterGit-Official).
+>  the development of this project has been paused and will resume after implementing a [solution](https://github.com/IMOitself/subfoldersync-vibe) to sync commits with [AfterGit-Official](https://github.com/IMOitself/AfterGit-Official).
 
 <br>
 
